@@ -5,9 +5,11 @@
 # Use a plot tool to show this in real time...?
 import matplotlib
 matplotlib.use('TKAgg')
+import sys
+sys.path.append("..")
 
-from Env import Env
-from Animat import Animat
+from Environment.Env import Env
+from Animat.Animat import Animat
 import time
 from numpy import zeros
 import random
@@ -58,5 +60,4 @@ for t in range(1,100):
 # animation
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat=False)
 plt.show()
-
 print 'Done!'
