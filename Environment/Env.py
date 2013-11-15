@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from numpy import *
+import random
 
 class Env:
 	
@@ -30,3 +31,15 @@ class Env:
 		elif (origx == newx and (origy == newy + 1 or origy == newy - 1)):
 			return True;
 		return False;
+		
+	def addFoodRandom(self):
+		# Pick a random spot on the map
+		foody = random.randrange(1,sizeOfSquare+1)
+		foodx = random.randrange(1,sizeOfSquare+1)
+		
+		# For now, lets have our gradient span almost the entire map.
+		# So for example, if our food is in the top left corner, it'll reach both the
+		# bottom left and top right corners. As a circle, it'll not quite reach the 
+		# bottom right. This also assumes a square map, which may not be what our final 
+		# design is.
+		 

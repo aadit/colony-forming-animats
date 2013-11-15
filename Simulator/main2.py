@@ -4,8 +4,11 @@
 
 import matplotlib
 matplotlib.use('TKAgg')
-from Env import Env
-from Animat import Animat
+import sys
+sys.path.append("..")
+
+from Environment.Env import Env
+from Animat.Animat import Animat
 import time
 from numpy import zeros
 import random
@@ -24,7 +27,7 @@ for iteration in range(1,10):
 	food.map[foody,foodx] = 5 # random number
 	
 	# pass animat object our map
-	food = a.goToLocation(foody,foodx,food)
+	# food = a.goToLocation(foody,foodx,food)
 	# animat should behave appropriately
 	# it should return the map unmodified
 	
