@@ -4,8 +4,11 @@
 
 import matplotlib
 matplotlib.use('TKAgg')
-from Env import Env
-from Animat import Animat
+import sys
+sys.path.append("..")
+
+from Environment.Env import Env
+from Animat.Animat import Animat
 import time
 from numpy import zeros
 import random

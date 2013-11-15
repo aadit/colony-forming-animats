@@ -6,6 +6,7 @@ import random
 
 class Animat:
 
+
 	def __init__(self,starty,startx):
 		self.y = starty
 		self.x = startx
@@ -31,5 +32,20 @@ class Animat:
 		
 	def moveEast(self):
 		self.x = self.x + 1
+
+	def goToLocation(self,desty,destx):
+		while desty == self.y and destx == self.x:
+			if (desty > self.y):
+			# Go south
+				moveSouth
+			elif (desty < self.y):
+			# Go north
+				moveNorth
+			if (destx > self.x):
+			# Go east
+				moveEast
+			elif (destx < self.x):
+			# Go west
+				moveWest
 		
 		
