@@ -16,15 +16,26 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 print 'Running Simulation 2'
-mapSize = 50
+mapSize = 15
 food = Env(mapSize)
 a = Animat.randomStart(mapSize,mapSize)
+food.makeGradient()
 
 for iteration in range(1,10):
 	# Pick a random spot
-	foody = random.randrange(1,mapSize+1)
-	foodx = random.randrange(1,mapSize+1)
+	foody = random.randrange(0,mapSize)
+	foodx = random.randrange(0,mapSize)
+	print str(foody) + ' ' + str(foodx) 
 	food.map[foody,foodx] = 5 # random number
 	
+	
+	# pass animat object our map
+	# food = a.goToLocation(foody,foodx,food)
+	# animat should behave appropriately
+	# it should return the map unmodified
+	
+	# check to see if the animat did the right thing
+	
+print (food.map)
 	
 	
