@@ -32,14 +32,30 @@ class Env:
 			return True;
 		return False;
 		
-	def addFoodRandom(self):
+	def makeGradient(self):
 		# Pick a random spot on the map
-		foody = random.randrange(1,sizeOfSquare+1)
-		foodx = random.randrange(1,sizeOfSquare+1)
+		foody = random.randrange(0,self.size)
+		foodx = random.randrange(0,self.size)
 		
 		# For now, lets have our gradient span almost the entire map.
 		# So for example, if our food is in the top left corner, it'll reach both the
 		# bottom left and top right corners. As a circle, it'll not quite reach the 
 		# bottom right. This also assumes a square map, which may not be what our final 
 		# design is.
-		 
+		
+		# Enforce that our size is odd number (11x11 or 25x25 or something)
+		if (self.size % 2 == 0):
+			self.size = self.size + 1
+			self.map = zeros((self.size,self.size))
+		
+		for column in range(0,self.size/2):
+			self.map[:,column] = concatenate((arange((self.size/2)+1,self.size,1),
+			arange(self.size,self.size/2,-1)),1) - self.size/2 + column
+			
+		for column in range(self.size/2,self.size):
+			self.map[:,column] = (
+				concatenate((arange((self.size/2)+1,self.size,1),
+				arange(self.size,self.size/2,-1)),1) + self.size/2 - column)
+				
+				
+								 
