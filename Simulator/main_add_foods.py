@@ -1,8 +1,5 @@
-# Sim 3
-# Make a gradient map four times as big as our environment map
-# Place a "food" item somewhere in our environment
-# "add" the appropriate gradient to our environment centered on the food
-# Be wary of even and odd numbers of columns, rows
+# Sim 4
+# Add multiple foods to a map
 
 import matplotlib
 matplotlib.use('TKAgg')
@@ -18,18 +15,15 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 print 'Running Simulation 3 - Gradient maker'
-mapSize = 13
+mapSize = 200
 food = Env(mapSize)
 a = Animat.randomStart(mapSize,mapSize)
 food.makeGradient()
+print 'Made gradient'
 
-
-fig1 = plt.figure()
-plt.pcolor(food.gradient)
-plt.ion()
-plt.show()
-
-food.makeFoodRandom()
+for count in range(0,10):
+	food.makeFoodRandom()
+	
 fig2 = plt.figure()
 plt.pcolor(food.map)
 plt.ion()

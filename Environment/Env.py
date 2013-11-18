@@ -55,28 +55,33 @@ class Env:
 				concatenate((arange((gradientSize/2)+1,gradientSize,1),
 				arange(gradientSize,gradientSize/2,-1)),1) + gradientSize/2 - column)
 				
+		# Make it do inverse square
+		# Reverse highs and lows
+		self.gradient = gradientSize + 1 - self.gradient
+		# square
+		self.gradient = power(self.gradient,2)
+		self.gradient = 1 / self.gradient
+				
 	def makeFoodRandom(self):
 		# Pick a random spot on the map
 		# Drop the gradient on top of it
 		foody = random.randrange(0,self.size)
 		foodx = random.randrange(0,self.size)
-		print 'foody: '+str(foody)
-		print 'foodx: '+str(foodx)
-				
+		#print 'foody: '+str(foody)
+		#print 'foodx: '+str(foodx)
+		self.makeFood(foody,foodx)
+									   			
+	def makeFood(self,foody,foodx):
 		gradCenterY = self.size - 1 # zero indexing
 		gradCenterX = self.size - 1
-		print 'gradCenterY: '+str(gradCenterY)
-		print 'gradCenterX: '+str(gradCenterX)
+		#print 'gradCenterY: '+str(gradCenterY)
+		#print 'gradCenterX: '+str(gradCenterX)
 		
 		gradStartY = gradCenterY - foody
 		gradStartX = gradCenterX - foodx
-		print 'gradStartY: '+str(gradStartY)
-		print 'gradStartX: '+str(gradStartX)
-		
-		print 'self.size: '+str(self.size)
-		
-		#if (self.size % 2 == 0):
+		#print 'gradStartY: '+str(gradStartY)
+		#print 'gradStartX: '+str(gradStartX)
+		#print 'self.size: '+str(self.size)
+
 		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
-							   			gradStartX:gradStartX + self.size ])
-							   			
-								 
+							   			gradStartX:gradStartX + self.size ])						 
