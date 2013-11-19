@@ -17,7 +17,7 @@ import matplotlib.animation as animation
 print 'Running Simulation 3 - Gradient maker'
 mapSize = 100
 food = Env(mapSize)
-a = Animat.randomStart(mapSize,mapSize)
+#a = Animat.randomStart(mapSize,mapSize)
 food.makeGradient()
 print 'Made gradient.'
 
