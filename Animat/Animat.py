@@ -45,10 +45,11 @@ class Animat:
 	def tick(self):
 		normalizedInputs = self.senseEnvironment() #Sense Environment
 		output = self.neuralNet.activate(normalizedInputs) #Propagate Neural Net
+		print "Output Neuron State is:"
 		print output
-		#performActions
+		self.performActions(output.tolist()) #Perform Actions based on outputs
 		self.expendEnergy()
-		#self.displayLocation()
+		self.displayLocation()
 		#self.printEnergy()
 		pass
 
@@ -63,7 +64,7 @@ class Animat:
 		print "y is " + str(self.y) + ", x is " + str(self.x)
 		
 	def move(self,newy,newx):
-		if env.canMove(self.y,self.x,newx,newy):
+		if self.env.canMove(self.y,self.x,newy,newx):
 			self.y = newy
 			self.x = newx
 			self.moved = True
@@ -101,6 +102,12 @@ class Animat:
 		maxVal = max(sensorOutput)
 		maxIndex = sensorOutput.index(maxVal)
 
+		print "Max value is: "
+		print maxVal
+
+		print "Max index is: "
+		print maxIndex
+
 		if maxIndex == 0:
 			pass # don't move
 
@@ -108,7 +115,7 @@ class Animat:
 			self.move(self.y, self.x + 1)
 
 		elif maxIndex == 2:
-			self.move(self.y, self.x -1)
+			self.move(self.y, self.x - 1)
 
 		elif maxIndex == 3:
 			self.move(self.y + 1, self.x)

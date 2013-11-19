@@ -26,6 +26,7 @@ filename = sys.argv[1]
 
 #Init Environment and food sources
 env = Env(250)
+env.makeGradient()
 for i in range (1, 20):
 	env.makeFoodRandom()
 env.updateMap()
