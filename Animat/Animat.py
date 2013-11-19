@@ -62,38 +62,11 @@ class Animat:
 	def displayLocation(self):
 		print "y is " + str(self.y) + ", x is " + str(self.x)
 		
-	def moveNorth(self):
-		self.y = self.y - 1
-		self.moved = True
-		
-	def moveSouth(self):
-		self.y = self.y + 1
-		self.moved = True
-
-	def moveWest(self):
-		self.x = self.x - 1
-		self.moved = True
-
-		
-	def moveEast(self):
-		self.x = self.x + 1
-		self.moved = True
-
-
-	def goToLocation(self,desty,destx):
-		while desty == self.y and destx == self.x:
-			if (desty > self.y):
-				# Go south
-				moveSouth
-			elif (desty < self.y):
-				# Go north
-				moveNorth
-			if (destx > self.x):
-				# Go east
-				moveEast
-			elif (destx < self.x):
-				# Go west
-				moveWest
+	def move(self,newy,newx):
+		if env.canMove(self.y,self.x,newx,newy):
+			self.y = newy
+			self.x = newx
+			self.moved = True
 
 	def jawAction(self,value):
 		if value > 0:
@@ -123,6 +96,27 @@ class Animat:
 	def printEnergy(self):
 		print self.energy
 
+	def performActions(self,sensorOutput):
+		#Get the max value of the sensor output and move in that direction
+		maxVal = max(sensorOutput)
+		maxIndex = sensorOutput.index(maxVal)
+
+		if maxIndex == 0:
+			pass # don't move
+
+		elif maxIndex == 1:
+			self.move(self.y, self.x + 1)
+
+		elif maxIndex == 2:
+			self.move(self.y, self.x -1)
+
+		elif maxIndex == 3:
+			self.move(self.y + 1, self.x)
+
+		elif maxIndex == 4:
+			self.move(self.y - 1, self.x)
+
+
 	def senseEnvironment(self):
 
 		inputValues = []
@@ -130,21 +124,21 @@ class Animat:
 		mapSize = self.env.size
 
 		#Append value sensed at current square
-		inputValues.append(self.env.map[self.x][self.y])
+		inputValues.append(self.env.map[self.y][self.x])
 
 		#Append value sensed at right square
 		if self.x + 1 >= mapSize:
 			inputValues.append(0)
 
 		else:
-			inputValues.append(self.env.map[self.x + 1][self.y])
+			inputValues.append(self.env.map[self.y][self.x + 1])
 
 		#Append value sensed at left square
 		if self.x - 1 < 0:
 			inputValues.append(0)
 
 		else:
-			inputValues.append(self.env.map[self.x - 1][self.y])
+			inputValues.append(self.env.map[self.y][self.x - 1])
 
 
 		#Append value sensed at top square
@@ -152,13 +146,13 @@ class Animat:
 			inputValues.append(0)
 
 		else:
-			inputValues.append(self.env.map[self.x][self.y + 1])
+			inputValues.append(self.env.map[self.y + 1][self.x])
 
 		if self.y - 1 < 0:
 			inputValues.append(0)
 
 		else:
-			inputValues.append(self.env.map[self.x][self.y - 1])
+			inputValues.append(self.env.map[self.y - 1][self.x])
 
 		#Normalize with max value in input values
 		maxVal = max(inputValues)
