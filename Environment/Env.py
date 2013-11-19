@@ -33,29 +33,55 @@ class Env:
 		return False;
 		
 	def makeGradient(self):
-		# Pick a random spot on the map
-		foody = random.randrange(0,self.size)
-		foodx = random.randrange(0,self.size)
-		
-		# For now, lets have our gradient span almost the entire map.
-		# So for example, if our food is in the top left corner, it'll reach both the
-		# bottom left and top right corners. As a circle, it'll not quite reach the 
-		# bottom right. This also assumes a square map, which may not be what our final 
-		# design is.
+		# Gradient will be four times as big, twice in y and twice in x
+		# Assumes square
+		gradientSize = (self.size * 2) - 1
 		
 		# Enforce that our size is odd number (11x11 or 25x25 or something)
-		if (self.size % 2 == 0):
-			self.size = self.size + 1
-			self.map = zeros((self.size,self.size))
+		# UPDATE - our size should now always be odd, this code is deprecated
+		if (gradientSize % 2 == 0):
+			gradientSize = gradientSize + 1
+			# UPDATE - we shouldn't run this code ever
+			print 'Error - gradient size was even'
+		self.gradient = zeros((gradientSize,gradientSize))
 		
-		for column in range(0,self.size/2):
-			self.map[:,column] = concatenate((arange((self.size/2)+1,self.size,1),
-			arange(self.size,self.size/2,-1)),1) - self.size/2 + column
+		for column in range(0,gradientSize/2):
+			self.gradient[:,column] = (							
+				concatenate((arange((gradientSize/2)+1,gradientSize,1),
+				arange(gradientSize,gradientSize/2,-1)),1) - gradientSize/2 + column)
 			
-		for column in range(self.size/2,self.size):
-			self.map[:,column] = (
-				concatenate((arange((self.size/2)+1,self.size,1),
-				arange(self.size,self.size/2,-1)),1) + self.size/2 - column)
+		for column in range(gradientSize/2,gradientSize):
+			self.gradient[:,column] = (
+				concatenate((arange((gradientSize/2)+1,gradientSize,1),
+				arange(gradientSize,gradientSize/2,-1)),1) + gradientSize/2 - column)
 				
+		# Make it do inverse square
+		# Reverse highs and lows
+		self.gradient = gradientSize + 1 - self.gradient
+		# square
+		self.gradient = power(self.gradient,2)
+		self.gradient = 1 / self.gradient
 				
-								 
+	def makeFoodRandom(self):
+		# Pick a random spot on the map
+		# Drop the gradient on top of it
+		foody = random.randrange(0,self.size)
+		foodx = random.randrange(0,self.size)
+		#print 'foody: '+str(foody)
+		#print 'foodx: '+str(foodx)
+		self.makeFood(foody,foodx)
+									   			
+	def makeFood(self,foody,foodx):
+		gradCenterY = self.size - 1 # zero indexing
+		gradCenterX = self.size - 1
+		#print 'gradCenterY: '+str(gradCenterY)
+		#print 'gradCenterX: '+str(gradCenterX)
+		
+		gradStartY = gradCenterY - foody
+		gradStartX = gradCenterX - foodx
+		#print 'gradStartY: '+str(gradStartY)
+		#print 'gradStartX: '+str(gradStartX)
+		#print 'self.size: '+str(self.size)
+
+		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
+							   			gradStartX:gradStartX + self.size ])						 
