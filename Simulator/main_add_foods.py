@@ -15,15 +15,17 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 print 'Running Simulation 3 - Gradient maker'
-mapSize = 200
+mapSize = 100
 food = Env(mapSize)
 a = Animat.randomStart(mapSize,mapSize)
 food.makeGradient()
-print 'Made gradient'
+print 'Made gradient.'
 
-for count in range(0,10):
+for count in range(0,20):
 	food.makeFoodRandom()
-	
+
+print str(count)+' food made.'
+
 fig2 = plt.figure()
 plt.pcolor(food.map)
 plt.ion()

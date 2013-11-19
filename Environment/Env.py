@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from numpy import *
+#import numpy as numpy
 import random
 
 class Env:
@@ -84,4 +85,17 @@ class Env:
 		#print 'self.size: '+str(self.size)
 
 		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
-							   			gradStartX:gradStartX + self.size ])						 
+							   			gradStartX:gradStartX + self.size ])	
+							   			
+	def removeFood(self,foody,foodx):
+		gradCenterY = self.size - 1 # zero indexing
+		gradCenterX = self.size - 1
+
+		gradStartY = gradCenterY - foody
+		gradStartX = gradCenterX - foodx
+
+		self.map = self.map - (self.gradient[gradStartY:gradStartY + self.size ,
+							   			gradStartX:gradStartX + self.size ])	
+		
+		self.map[self.map < 0] = 0
+		
