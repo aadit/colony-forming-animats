@@ -3,12 +3,14 @@
 from numpy import *
 #import numpy as numpy
 import random
+from Environment.FoodGenerator import FoodGenerator
 
 class Env:
 	
 	def __init__(self,sizeOfSquare):
 		self.map = zeros((sizeOfSquare,sizeOfSquare));
 		self.size = sizeOfSquare;
+		self.foodGeneratorList = [];
 		
 	def displayMap(self):
 		print(self.map)
@@ -16,6 +18,12 @@ class Env:
 	def displaySize(self):
 		print 'Size is ' + str(self.size)
 	
+	def tick(self):
+		# the main activator for the environment
+		# 1. Tick others
+		for fg in self.foodGeneratorList:
+			fg.tick(self)
+		
 	# @classmethod
 	def canMove(self,origy, origx, newy, newx):
 		# Are the starting and ending locations on the map?
@@ -98,4 +106,15 @@ class Env:
 							   			gradStartX:gradStartX + self.size ])	
 		
 		self.map[self.map < 0] = 0
+		
+	def addFoodGenerator(self,locy,locx,frequency):
+		# Make sure this location resides in our map
+		if (locy < 0 or locy > self.size or locx < 0 or locx > self.size):
+			# Bad location
+			print 'Bad location for food generator! Not on map'
+		else:
+			#frequency = 25; # random for now
+			f = FoodGenerator(locy,locx,frequency)
+			self.foodGeneratorList.append(f)
+			
 		
