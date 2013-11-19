@@ -10,7 +10,7 @@ class NNInitializer:
 
 	#A few constants for this function....
 	NEURAL_NET_OBJECT_PATH = "../PickledObjects/NeuralNets/"
-	NUMBER_OF_DATA_SETS = 10000
+	NUMBER_OF_DATA_SETS = 100000
 	NUMBER_OF_INPUTS    = 5
 	NUMBER_OF_OUTPUTS   = 5
 

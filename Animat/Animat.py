@@ -19,7 +19,7 @@ class Animat:
 	MOVEMENT_COST	= 1.0 # Cost to move one unit
 
 
-	def __init__(self,starty,startx, env):
+	def __init__(self,starty,startx, env, filename):
 
 		#Initialize instance parameters
 		self.jaw = 0
@@ -34,20 +34,17 @@ class Animat:
 		self.foodToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
 		self.eatingRateToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
 
-		#NeuralNet
-
+		#Load the Neural Net
 		nni = NNInitializer()
-
-		self.neuralNet = nni.readNetwork('nn1.p')
+		self.neuralNet = nni.readNetwork(filename)
 
 		#Update Class Parameters
 		Animat.count += 1
 
 
-	def tick(self,inputs):
-		#senseStates
-		#propagateNeuralNet
-		output = self.neuralNet.activate(inputs)	
+	def tick(self):
+		normalizedInputs = self.senseEnvironment() #Sense Environment
+		output = self.neuralNet.activate(normalizedInputs) #Propagate Neural Net
 		print output
 		#performActions
 		self.expendEnergy()
@@ -125,6 +122,59 @@ class Animat:
 
 	def printEnergy(self):
 		print self.energy
+
+	def senseEnvironment(self):
+
+		inputValues = []
+
+		mapSize = self.env.size
+
+		#Append value sensed at current square
+		inputValues.append(self.env.map[self.x][self.y])
+
+		#Append value sensed at right square
+		if self.x + 1 >= mapSize:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.x + 1][self.y])
+
+		#Append value sensed at left square
+		if self.x - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.x - 1][self.y])
+
+
+		#Append value sensed at top square
+		if self.y + 1 >= mapSize:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.x][self.y + 1])
+
+		if self.y - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.x][self.y - 1])
+
+		#Normalize with max value in input values
+		maxVal = max(inputValues)
+		if maxVal != 0:
+			normalizedInputValues = [i/maxVal for i in inputValues]
+
+		print "Sensed environment is: "
+		print inputValues
+
+		print "Normalized values are: " 
+		print normalizedInputValues
+
+		return normalizedInputValues
+
+
+
 
 
 
