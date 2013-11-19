@@ -1,7 +1,11 @@
 #!/usr/bin/python
 
-# from Animat import Animat
+from NNInitializer import NNInitializer
 from Environment.Env import Env
+from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, FullConnection
+from pybrain.datasets import SupervisedDataSet
+from pybrain.supervised.trainers import BackpropTrainer
+
 import random
 import copy
 
@@ -25,21 +29,30 @@ class Animat:
 		self.env = env
 		self.moved = False
 
-		#threshold parameters
+		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
-		self.food2EnergyWeights = [0.25, 0.25, 0.25, 0.25]
-		self.eatingRate2EnergyWeights = [0.25, 0.25, 0.25, 0.25]
+		self.foodToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
+		self.eatingRateToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
+
+		#NeuralNet
+
+		nni = NNInitializer()
+
+		self.neuralNet = nni.readNetwork('nn1.p')
 
 		#Update Class Parameters
 		Animat.count += 1
 
-	def tick(self):
+
+	def tick(self,inputs):
 		#senseStates
 		#propagateNeuralNet
+		output = self.neuralNet.activate(inputs)	
+		print output
 		#performActions
 		self.expendEnergy()
-		self.displayLocation()
-		self.printEnergy()
+		#self.displayLocation()
+		#self.printEnergy()
 		pass
 
 	@classmethod
@@ -94,20 +107,21 @@ class Animat:
 	def expendEnergy(self):
 		if self.moved:
 			self.energy -= Animat.MOVEMENT_COST
-			self.moved = False #rese variable for next tick
+			self.moved = False #reset variable for next tick
 
 		self.energy -= Animat.LIVING_COST
 
 		if self.energy <= 0:
-			self.energy = 0
+			self.energy = 0 #can't have negative energy
 			self.die()
 
 	def die(self):
+		Animat.count -= 1
 		pass #replace w/ self.env.removeAnimatFromMap()
 
 	def eat(self,foodItem):
 		foodItem.bites += 1
-		energy += self.food2EnergyWeights[foodItem.sourceNumber] #get this much energy from eating this food
+		energy += self.foodToEnergyWeights[foodItem.sourceNumber] #get this much energy from eating this food
 
 	def printEnergy(self):
 		print self.energy
