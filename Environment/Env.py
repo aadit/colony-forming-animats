@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from numpy import *
-#import numpy as numpy
 import random
 from Environment.FoodGenerator import FoodGenerator
 from Environment.Food import Food
@@ -15,14 +14,37 @@ class Env:
 		self.foodList = [];
 		self.foodCounter = 0;
 		
+	def tick(self):
+		# the main activator for the environment
+		# 1. Tick others
+		for fg in self.foodGeneratorList:
+			fg.tick(self)
+		self.updateMap();
+		
+	def getScentsNWSEC(self,animaty,animatx,foodType):
+		# Given an animat's position, return the 5 "scents" around it.
+		# NWSEC stand for North, West, South, East, and Center
+		# The values will be returned in this order
+		
+		if (self.validPoint(animaty,animatx)):
+			return (self.map[animaty-1,animatx  ],
+					self.map[animaty  ,animatx-1],
+					self.map[animaty+1,animatx  ],
+					self.map[animaty  ,animatx+1],
+					self.map[animaty,animatx])
+		else:
+			return -1, -1, -1, -1, -1;
+		
+	def validPoint(self,y,x):
+		return (0 <= y and 0 <= x and y < self.size and x < self.size)
+		
 	def addGradient(self,foody,foodx):
 		gradCenterY = self.size - 1 # zero indexing
 		gradCenterX = self.size - 1
-		#print 'gradCenterY: '+str(gradCenterY)
-		#print 'gradCenterX: '+str(gradCenterX)
-		
 		gradStartY = gradCenterY - foody
 		gradStartX = gradCenterX - foodx
+		#print 'gradCenterY: '+str(gradCenterY)
+		#print 'gradCenterX: '+str(gradCenterX)
 		#print 'gradStartY: '+str(gradStartY)
 		#print 'gradStartX: '+str(gradStartX)
 		#print 'self.size: '+str(self.size)
@@ -34,18 +56,12 @@ class Env:
 		# This allows us to update the map whenever necessary
 		# Iterate through foodList
 		# Add to map accordingly
+		self.map = zeros((self.size,self.size));
 		for food in self.foodList:
 			self.addGradient(food.y,food.x);
 	
 	def displaySize(self):
 		print 'Size is ' + str(self.size)
-	
-	def tick(self):
-		# the main activator for the environment
-		# 1. Tick others
-		for fg in self.foodGeneratorList:
-			fg.tick(self)
-		self.updateMap();
 
 	def canMove(self,origy, origx, newy, newx):
 		# Are the starting and ending locations on the map?
@@ -95,48 +111,18 @@ class Env:
 				
 	def makeFoodRandom(self):
 		# Pick a random spot on the map
-		# Drop the gradient on top of it
 		foody = random.randrange(0,self.size)
 		foodx = random.randrange(0,self.size)
-		#print 'foody: '+str(foody)
-		#print 'foodx: '+str(foodx)
 		self.makeFood(foody,foodx)
 									   			
 	def makeFood(self,foody,foodx):
-		#gradCenterY = self.size - 1 # zero indexing
-		#gradCenterX = self.size - 1
-		#print 'gradCenterY: '+str(gradCenterY)
-		#print 'gradCenterX: '+str(gradCenterX)
-		
-		#gradStartY = gradCenterY - foody
-		#gradStartX = gradCenterX - foodx
-		#print 'gradStartY: '+str(gradStartY)
-		#print 'gradStartX: '+str(gradStartX)
-		#print 'self.size: '+str(self.size)
-
 		self.foodList.append( Food(self.foodCounter,foody,foodx,10));
-		
-		#self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
-		#					   			gradStartX:gradStartX + self.size ])	
-							   			
-	#def removeFood(self,foody,foodx):
+						   			
 	def removeFood(self,id):
-		#gradCenterY = self.size - 1 # zero indexing
-		#gradCenterX = self.size - 1
-
-		#gradStartY = gradCenterY - foody
-		#gradStartX = gradCenterX - foodx
-
-		#self.map = self.map - (self.gradient[gradStartY:gradStartY + self.size ,
-		#					   			gradStartX:gradStartX + self.size ])	
-		
-		#self.map[self.map < 0] = 0
-		
 		for index,food in self.foodList:
 			if food.id == id:
 				del self.foodList[index];
 				break;
-				
 		
 	def addFoodGenerator(self,locy,locx,frequency):
 		# Make sure this location resides in our map
