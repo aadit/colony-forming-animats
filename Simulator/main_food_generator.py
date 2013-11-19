@@ -23,14 +23,28 @@ food = Env(mapSize)
 food.makeGradient()
 print 'Made gradient.'
 
-food.addFoodGenerator(20,20,1)
+food.addFoodGenerator(20,20,10)
 food.addFoodGenerator(90,50,50)
 food.addFoodGenerator(25,88,200)
 
+ims = []
+fig = plt.figure()
 for iterations in range(0,1000):
 	food.tick()
+	# animation
+	im = plt.imshow(food.map)
+	ims.append([im])
+	if (iterations % 100 == 0):
+		print 'Iteration: '+str(iterations)
+	
+food.addFoodGenerator(45,75,5)
+for iterations in range(1000,2000):
+	food.tick()
+	# animation
+	im = plt.imshow(food.map)
+	ims.append([im])
+	if (iterations % 100 == 0):
+		print 'Iteration: '+str(iterations)
 
-fig2 = plt.figure()
-plt.pcolor(food.map)
-plt.ion()
+ani = animation.ArtistAnimation(fig, ims, interval=1, blit=True, repeat=False)
 plt.show()
