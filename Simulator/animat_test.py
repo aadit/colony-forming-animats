@@ -16,21 +16,20 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+if len(sys.argv) < 2:
+	print "Filename required for neural net"
+	exit()
+
 print 'Running Animat Simulations'
+#Load initial Neural Net
+filename = sys.argv[1] 
 
-#Global Environment
-env = Env(1000)
-animatList = [] #init to empty list
+#Init Environment and food sources
+env = Env(250)
+for i in range (1, 20):
+	env.makeFoodRandom()
+env.updateMap()
 
-#create a few animats
-#for x in range(1,100):
-	#animatList.append(Animat(0,0,env))
-
-#print "Added 100 animats"
-
-nni = NNInitializer()
-nni.initNetwork()
-nni.saveNetwork('nn1.p')
-
-a = Animat(0,0,env)
+#Create Animat
+a = Animat(0,0,env, filename)
 

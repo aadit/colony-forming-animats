@@ -19,7 +19,7 @@ class Animat:
 	MOVEMENT_COST	= 1.0 # Cost to move one unit
 
 
-	def __init__(self,starty,startx, env):
+	def __init__(self,starty,startx, env, filename):
 
 		#Initialize instance parameters
 		self.jaw = 0
@@ -34,20 +34,17 @@ class Animat:
 		self.foodToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
 		self.eatingRateToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
 
-		#NeuralNet
-
+		#Load the Neural Net
 		nni = NNInitializer()
-
-		self.neuralNet = nni.readNetwork('nn1.p')
+		self.neuralNet = nni.readNetwork(filename)
 
 		#Update Class Parameters
 		Animat.count += 1
 
 
-	def tick(self,inputs):
-		#senseStates
-		#propagateNeuralNet
-		output = self.neuralNet.activate(inputs)	
+	def tick(self):
+		normalizedInputs = self.senseEnvironment() #Sense Environment
+		output = self.neuralNet.activate(normalizedInputs) #Propagate Neural Net
 		print output
 		#performActions
 		self.expendEnergy()
@@ -65,38 +62,11 @@ class Animat:
 	def displayLocation(self):
 		print "y is " + str(self.y) + ", x is " + str(self.x)
 		
-	def moveNorth(self):
-		self.y = self.y - 1
-		self.moved = True
-		
-	def moveSouth(self):
-		self.y = self.y + 1
-		self.moved = True
-
-	def moveWest(self):
-		self.x = self.x - 1
-		self.moved = True
-
-		
-	def moveEast(self):
-		self.x = self.x + 1
-		self.moved = True
-
-
-	def goToLocation(self,desty,destx):
-		while desty == self.y and destx == self.x:
-			if (desty > self.y):
-				# Go south
-				moveSouth
-			elif (desty < self.y):
-				# Go north
-				moveNorth
-			if (destx > self.x):
-				# Go east
-				moveEast
-			elif (destx < self.x):
-				# Go west
-				moveWest
+	def move(self,newy,newx):
+		if env.canMove(self.y,self.x,newx,newy):
+			self.y = newy
+			self.x = newx
+			self.moved = True
 
 	def jawAction(self,value):
 		if value > 0:
@@ -125,6 +95,80 @@ class Animat:
 
 	def printEnergy(self):
 		print self.energy
+
+	def performActions(self,sensorOutput):
+		#Get the max value of the sensor output and move in that direction
+		maxVal = max(sensorOutput)
+		maxIndex = sensorOutput.index(maxVal)
+
+		if maxIndex == 0:
+			pass # don't move
+
+		elif maxIndex == 1:
+			self.move(self.y, self.x + 1)
+
+		elif maxIndex == 2:
+			self.move(self.y, self.x -1)
+
+		elif maxIndex == 3:
+			self.move(self.y + 1, self.x)
+
+		elif maxIndex == 4:
+			self.move(self.y - 1, self.x)
+
+
+	def senseEnvironment(self):
+
+		inputValues = []
+
+		mapSize = self.env.size
+
+		#Append value sensed at current square
+		inputValues.append(self.env.map[self.y][self.x])
+
+		#Append value sensed at right square
+		if self.x + 1 >= mapSize:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.y][self.x + 1])
+
+		#Append value sensed at left square
+		if self.x - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.y][self.x - 1])
+
+
+		#Append value sensed at top square
+		if self.y + 1 >= mapSize:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.y + 1][self.x])
+
+		if self.y - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.env.map[self.y - 1][self.x])
+
+		#Normalize with max value in input values
+		maxVal = max(inputValues)
+		if maxVal != 0:
+			normalizedInputValues = [i/maxVal for i in inputValues]
+
+		print "Sensed environment is: "
+		print inputValues
+
+		print "Normalized values are: " 
+		print normalizedInputValues
+
+		return normalizedInputValues
+
+
+
 
 
 
