@@ -4,6 +4,7 @@ from numpy import *
 #import numpy as numpy
 import random
 from Environment.FoodGenerator import FoodGenerator
+from Environment.Food import Food
 
 class Env:
 	
@@ -11,9 +12,30 @@ class Env:
 		self.map = zeros((sizeOfSquare,sizeOfSquare));
 		self.size = sizeOfSquare;
 		self.foodGeneratorList = [];
+		self.foodList = [];
+		self.foodCounter = 0;
 		
-	def displayMap(self):
-		print(self.map)
+	def addGradient(self,foody,foodx):
+		gradCenterY = self.size - 1 # zero indexing
+		gradCenterX = self.size - 1
+		#print 'gradCenterY: '+str(gradCenterY)
+		#print 'gradCenterX: '+str(gradCenterX)
+		
+		gradStartY = gradCenterY - foody
+		gradStartX = gradCenterX - foodx
+		#print 'gradStartY: '+str(gradStartY)
+		#print 'gradStartX: '+str(gradStartX)
+		#print 'self.size: '+str(self.size)
+		
+		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
+							   			gradStartX:gradStartX + self.size ])
+		
+	def updateMap(self):
+		# This allows us to update the map whenever necessary
+		# Iterate through foodList
+		# Add to map accordingly
+		for food in self.foodList:
+			self.addGradient(food.y,food.x);
 	
 	def displaySize(self):
 		print 'Size is ' + str(self.size)
@@ -23,8 +45,8 @@ class Env:
 		# 1. Tick others
 		for fg in self.foodGeneratorList:
 			fg.tick(self)
-		
-	# @classmethod
+		self.updateMap();
+
 	def canMove(self,origy, origx, newy, newx):
 		# Are the starting and ending locations on the map?
 		if (origy < 0 or origy > self.size -1
@@ -81,31 +103,40 @@ class Env:
 		self.makeFood(foody,foodx)
 									   			
 	def makeFood(self,foody,foodx):
-		gradCenterY = self.size - 1 # zero indexing
-		gradCenterX = self.size - 1
+		#gradCenterY = self.size - 1 # zero indexing
+		#gradCenterX = self.size - 1
 		#print 'gradCenterY: '+str(gradCenterY)
 		#print 'gradCenterX: '+str(gradCenterX)
 		
-		gradStartY = gradCenterY - foody
-		gradStartX = gradCenterX - foodx
+		#gradStartY = gradCenterY - foody
+		#gradStartX = gradCenterX - foodx
 		#print 'gradStartY: '+str(gradStartY)
 		#print 'gradStartX: '+str(gradStartX)
 		#print 'self.size: '+str(self.size)
 
-		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
-							   			gradStartX:gradStartX + self.size ])	
-							   			
-	def removeFood(self,foody,foodx):
-		gradCenterY = self.size - 1 # zero indexing
-		gradCenterX = self.size - 1
-
-		gradStartY = gradCenterY - foody
-		gradStartX = gradCenterX - foodx
-
-		self.map = self.map - (self.gradient[gradStartY:gradStartY + self.size ,
-							   			gradStartX:gradStartX + self.size ])	
+		self.foodList.append( Food(self.foodCounter,foody,foodx,10));
 		
-		self.map[self.map < 0] = 0
+		#self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
+		#					   			gradStartX:gradStartX + self.size ])	
+							   			
+	#def removeFood(self,foody,foodx):
+	def removeFood(self,id):
+		#gradCenterY = self.size - 1 # zero indexing
+		#gradCenterX = self.size - 1
+
+		#gradStartY = gradCenterY - foody
+		#gradStartX = gradCenterX - foodx
+
+		#self.map = self.map - (self.gradient[gradStartY:gradStartY + self.size ,
+		#					   			gradStartX:gradStartX + self.size ])	
+		
+		#self.map[self.map < 0] = 0
+		
+		for index,food in self.foodList:
+			if food.id == id:
+				del self.foodList[index];
+				break;
+				
 		
 	def addFoodGenerator(self,locy,locx,frequency):
 		# Make sure this location resides in our map

@@ -25,6 +25,7 @@ for count in range(0,20):
 	food.makeFoodRandom()
 
 print str(count)+' food made.'
+food.updateMap();
 
 fig2 = plt.figure()
 plt.pcolor(food.map)
