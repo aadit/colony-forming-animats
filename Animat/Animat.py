@@ -118,10 +118,10 @@ class Animat:
 			self.move(self.y, self.x - 1)
 
 		elif maxIndex == 3:
-			self.move(self.y + 1, self.x)
+			self.move(self.y - 1, self.x)
 
 		elif maxIndex == 4:
-			self.move(self.y - 1, self.x)
+			self.move(self.y + 1, self.x)
 
 
 	def senseEnvironment(self):
@@ -135,7 +135,14 @@ class Animat:
 
 		return normalizedInputValues
 
-
+	def isOnFood(self):
+		scents = self.senseEnvironment();
+		if (scents[0] > scents[1] and
+			scents[0] > scents[2] and
+			scents[0] > scents[3] and
+			scents[0] > scents[4]):
+			return True;
+		return False;
 
 
 

@@ -38,6 +38,8 @@ for i in range(0,1000):
 	im = plt.imshow(env.map)
 	im.set_cmap('spectral')
 	ims.append([im])
+
+env.tick()
 	
 print 'Finished ticking'
 
