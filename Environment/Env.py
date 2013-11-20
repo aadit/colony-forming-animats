@@ -46,17 +46,19 @@ class Env:
 
 
 		#Append value sensed at top square
+		# CHANGE - Towards origin
+		if animaty - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.map[animaty - 1][animatx])
+
+		# CHNANGE - away from origin
 		if animaty + 1 >= mapSize:
 			inputValues.append(0)
 
 		else:
 			inputValues.append(self.map[animaty + 1][animatx])
-
-		if animaty- 1 < 0:
-			inputValues.append(0)
-
-		else:
-			inputValues.append(self.map[animaty - 1][animatx])
 		
 		return inputValues;
 		
@@ -147,7 +149,7 @@ class Env:
 		self.foodList.append( Food(self.foodCounter,foody,foodx,10));
 						   			
 	def removeFood(self,id):
-		for index,food in self.foodList:
+		for index,food in enumerate(self.foodList):
 			if food.id == id:
 				del self.foodList[index];
 				break;
