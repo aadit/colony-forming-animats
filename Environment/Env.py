@@ -162,4 +162,14 @@ class Env:
 			f = FoodGenerator(locy,locx,frequency)
 			self.foodGeneratorList.append(f)
 			
+	def returnFoodIDAt(self,foody,foodx):
+		# Given the input locations, traverse the foodList looking for the food
+		# that matches.
+		# If found, return the ID
+		# else, return -1
+		for food in self.foodList:
+			if (food.y == foody and food.x == foodx):
+				return food.id
+				break
+		return -1
 		
