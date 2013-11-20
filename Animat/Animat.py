@@ -45,6 +45,8 @@ class Animat:
 	def tick(self):
 		normalizedInputs = self.senseEnvironment() #Sense Environment
 		output = self.neuralNet.activate(normalizedInputs) #Propagate Neural Net
+		print "Normalized Inputs are: "
+		print normalizedInputs
 		print "Output Neuron State is:"
 		print output
 		self.performActions(output.tolist()) #Perform Actions based on outputs
@@ -109,7 +111,13 @@ class Animat:
 		print maxIndex
 
 		if maxIndex == 0:
-			pass # don't move
+			if self.isOnFood():
+				foodId = self.env.returnFoodIDAt(self.y,self.x)
+				if foodId != -1:
+					print "Food removed from environment"
+					self.env.removeFood(foodId)
+					#self.env.updateMap()
+
 
 		elif maxIndex == 1:
 			self.move(self.y, self.x + 1)
@@ -128,6 +136,7 @@ class Animat:
 
 		inputValues = self.env.getScentsCEWNS(self.y,self.x, 4)
 
+		normalizedInputValues = [0] * 5
 		#Normalize with max value in input values
 		maxVal = max(inputValues)
 		if maxVal != 0:

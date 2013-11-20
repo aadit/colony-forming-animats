@@ -17,11 +17,11 @@ import matplotlib.animation as animation
 
 print 'Running Simulation - Find food'
 
-filename = 'nn_100k.p'
+filename = 'nn_precise_100k.p'
 #Init Environment and food sources
-env = Env(250)
+env = Env(30)
 env.makeGradient()
-for i in range (1, 10):
+for i in range (0,10):
 	env.makeFoodRandom()
 	#env.makeFood(20,20);
 env.updateMap()
