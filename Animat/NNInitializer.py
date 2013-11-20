@@ -70,7 +70,7 @@ class NNInitializer:
 			trainingOutput = [0] * NNInitializer.NUMBER_OF_OUTPUTS #start w/ list of all 0's
 
 			for j in range (0, NNInitializer.NUMBER_OF_INPUTS):
-				trainingInput.append(random.uniform(0.0, 1.0)) #add randomInputs between 0 -> 1, inclusive
+				trainingInput.append(random.triangular(0.0, 1.0,0.985)) #add randomInputs between 0 -> 1, inclusive
 
 			#print trainingInput
 			maxVal = max(trainingInput)
