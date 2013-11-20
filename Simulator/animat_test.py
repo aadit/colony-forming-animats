@@ -27,10 +27,14 @@ filename = sys.argv[1]
 #Init Environment and food sources
 env = Env(250)
 env.makeGradient()
-for i in range (1, 20):
+for i in range (1, 2):
 	env.makeFoodRandom()
 env.updateMap()
 
 #Create Animat
 a = Animat(0,0,env, filename)
+
+while(1):
+	a.tick()
+
 
