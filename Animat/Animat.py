@@ -126,51 +126,12 @@ class Animat:
 
 	def senseEnvironment(self):
 
-		inputValues = []
-
-		mapSize = self.env.size
-
-		#Append value sensed at current square
-		inputValues.append(self.env.map[self.y][self.x])
-
-		#Append value sensed at right square
-		if self.x + 1 >= mapSize:
-			inputValues.append(0)
-
-		else:
-			inputValues.append(self.env.map[self.y][self.x + 1])
-
-		#Append value sensed at left square
-		if self.x - 1 < 0:
-			inputValues.append(0)
-
-		else:
-			inputValues.append(self.env.map[self.y][self.x - 1])
-
-
-		#Append value sensed at top square
-		if self.y + 1 >= mapSize:
-			inputValues.append(0)
-
-		else:
-			inputValues.append(self.env.map[self.y + 1][self.x])
-
-		if self.y - 1 < 0:
-			inputValues.append(0)
-
-		else:
-			inputValues.append(self.env.map[self.y - 1][self.x])
+		inputValues = self.env.getSenseCEWNS(self.y,self.x, 4)
 
 		#Normalize with max value in input values
 		maxVal = max(inputValues)
 		if maxVal != 0:
 			normalizedInputValues = [i/maxVal for i in inputValues]
-
-		print "Sensed environment is: "
-		print inputValues
-
-		print "Normalized values are: " 
-		print normalizedInputValues
 
 		return normalizedInputValues
 
