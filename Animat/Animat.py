@@ -126,7 +126,7 @@ class Animat:
 
 	def senseEnvironment(self):
 
-		inputValues = self.env.getSenseCEWNS(self.y,self.x, 4)
+		inputValues = self.env.getScentsCEWNS(self.y,self.x, 4)
 
 		#Normalize with max value in input values
 		maxVal = max(inputValues)
