@@ -21,19 +21,44 @@ class Env:
 			fg.tick(self)
 		self.updateMap();
 		
-	def getScentsNWSEC(self,animaty,animatx,foodType):
+	def getScentsCEWNS(self,animaty,animatx,foodType):
 		# Given an animat's position, return the 5 "scents" around it.
 		# NWSEC stand for North, West, South, East, and Center
 		# The values will be returned in this order
 		
-		if (self.validPoint(animaty,animatx)):
-			return (self.map[animaty-1,animatx  ],
-					self.map[animaty  ,animatx-1],
-					self.map[animaty+1,animatx  ],
-					self.map[animaty  ,animatx+1],
-					self.map[animaty,animatx])
+		inputValues = [];
+		mapSize = self.size;
+		inputValues.append(self.map[animaty][animatx])
+
+		#Append value sensed at right square
+		if animatx + 1 >= mapSize:
+			inputValues.append(0)
+
 		else:
-			return -1, -1, -1, -1, -1;
+			inputValues.append(self.map[animaty][animatx + 1])
+
+		#Append value sensed at left square
+		if animatx - 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.map[animaty][animatx - 1])
+
+
+		#Append value sensed at top square
+		if animaty + 1 >= mapSize:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.map[animaty + 1][animatx])
+
+		if animaty- 1 < 0:
+			inputValues.append(0)
+
+		else:
+			inputValues.append(self.map[animaty - 1][animatx])
+		
+		return inputValues;
 		
 	def validPoint(self,y,x):
 		return (0 <= y and 0 <= x and y < self.size and x < self.size)
