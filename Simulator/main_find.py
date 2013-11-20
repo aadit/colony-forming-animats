@@ -19,9 +19,9 @@ print 'Running Simulation - Find food'
 
 filename = 'nn_100k.p'
 #Init Environment and food sources
-env = Env(250)
+env = Env(25)
 env.makeGradient()
-for i in range (1, 10):
+for i in range (1, 3):
 	env.makeFoodRandom()
 	#env.makeFood(20,20);
 env.updateMap()
