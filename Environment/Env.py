@@ -63,6 +63,9 @@ class Env:
 	def validPoint(self,y,x):
 		return (0 <= y and 0 <= x and y < self.size and x < self.size)
 		
+	def maxValue(self):
+		return self.map.max();
+	
 	def addGradient(self,foody,foodx):
 		gradCenterY = self.size - 1 # zero indexing
 		gradCenterX = self.size - 1

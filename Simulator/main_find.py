@@ -21,23 +21,29 @@ filename = 'nn_100k.p'
 #Init Environment and food sources
 env = Env(250)
 env.makeGradient()
-for i in range (1, 2):
+for i in range (1, 10):
 	env.makeFoodRandom()
+	#env.makeFood(20,20);
 env.updateMap()
 
 #Create Animat
 a = Animat(0,0,env, filename)
 
-ims = []
 fig = plt.figure()
-for i in range(0,20):#while(500):
+ims = []
+for i in range(0,1000):
 	env.tick()
 	a.tick()
-	#env.map[a.y,a.x] = 10
+	env.map[a.y,a.x] = env.map.max();
 	im = plt.imshow(env.map)
+	im.set_cmap('spectral')
 	ims.append([im])
 	
 print 'Finished ticking'
 
-ani = animation.ArtistAnimation(fig, ims, interval=1, blit=True, repeat=False)
+ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
+	repeat=False)
+plt.colorbar()
 plt.show()
+
+print 'Finished animating'
