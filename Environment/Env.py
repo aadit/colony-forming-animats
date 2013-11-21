@@ -147,6 +147,7 @@ class Env:
 									   			
 	def makeFood(self,foody,foodx):
 		self.foodList.append( Food(self.foodCounter,foody,foodx,10));
+		self.foodCounter += 1;
 						   			
 	def removeFood(self,id):
 		for index,food in enumerate(self.foodList):

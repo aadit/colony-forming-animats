@@ -19,15 +19,9 @@ print 'Running Simulation - Find food'
 
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
-<<<<<<< HEAD
-env = Env(125)
-env.makeGradient()
-for i in range (1, 3):
-=======
-env = Env(30)
+env = Env(100)
 env.makeGradient()
 for i in range (0,10):
->>>>>>> working
 	env.makeFoodRandom()
 	#env.makeFood(20,20);
 env.updateMap()
@@ -37,7 +31,7 @@ a = Animat(0,0,env, filename)
 
 fig = plt.figure()
 ims = []
-for i in range(0,1000):
+for i in range(0,300):
 	env.tick()
 	a.tick()
 	env.map[a.y,a.x] = env.map.max();
@@ -54,4 +48,8 @@ ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 plt.colorbar()
 plt.show()
 
-print 'Finished animating'
+print 'Saving animation...'
+#ani.save('search_and_destroy.mp4')
+
+
+print 'Finished!'
