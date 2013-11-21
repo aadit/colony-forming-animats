@@ -10,6 +10,7 @@ class NNInitializer:
 
 	#A few constants for this function....
 	NEURAL_NET_OBJECT_PATH = "../PickledObjects/NeuralNets/"
+	TRAINING_SET_OBJECT_PATH = "../PickledObjects/TrainingSets/"
 	NUMBER_OF_DATA_SETS = 100000
 	NUMBER_OF_INPUTS    = 5
 	NUMBER_OF_OUTPUTS   = 5
@@ -41,7 +42,9 @@ class NNInitializer:
 		
 		#Add supervised data sets
 		ds = SupervisedDataSet(NNInitializer.NUMBER_OF_INPUTS, NNInitializer.NUMBER_OF_OUTPUTS)
-		inputSet, outputSet = self.generateTrainingSet()
+		inputSet, outputSet = self.loadTrainingSet('scents_based_input',
+													'scents_based_output')
+		#inputSet, outputSet = self.generateTrainingSet()
 
 		print "Adding samples to data set...."
 		for i,val  in enumerate(inputSet):
@@ -84,6 +87,19 @@ class NNInitializer:
 		print "Done."
 		return (inputSet, outputSet)
 
+	def loadTrainingSet(self,inputFilename,outputFilename):
+		file_path = NNInitializer.TRAINING_SET_OBJECT_PATH + inputFilename
+		fd = open(file_path,"rb")
+		inputSet = pickle.load(fd)
+		fd.close()
+		
+		file_path = NNInitializer.TRAINING_SET_OBJECT_PATH + outputFilename
+		fd = open(file_path,"rb")
+		outputSet = pickle.load(fd)
+		fd.close()
+		
+		return (inputSet,outputSet)
+	
 	def saveNetwork(self,filename):
 		file_path = NNInitializer.NEURAL_NET_OBJECT_PATH + filename
 		fd = open(file_path,"wb")

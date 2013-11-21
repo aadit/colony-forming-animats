@@ -17,9 +17,10 @@ import matplotlib.animation as animation
 
 print 'Running Simulation - Find food'
 
+#filename = 'nn_scents_based.p'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
-env = Env(100)
+env = Env(50)
 env.makeGradient()
 for i in range (0,10):
 	env.makeFoodRandom()
@@ -31,7 +32,7 @@ a = Animat(0,0,env, filename)
 
 fig = plt.figure()
 ims = []
-for i in range(0,300):
+for i in range(0,50):
 	env.tick()
 	a.tick()
 	env.map[a.y,a.x] = env.map.max();
