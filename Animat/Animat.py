@@ -14,21 +14,24 @@ class Animat:
 
 	#Class Parameters
 	count = 0
+	ID = -1;
 
 	#Animat Parameter Constants
 	LIVING_COST 	= 0.1 # Metabolic cost
 	MOVEMENT_COST	= 1.0 # Cost to move one unit
 
 
-	def __init__(self,starty,startx, env, filename):
+	def __init__(self,starty,startx, env, filename, idnum):
 
 		#Initialize instance parameters
 		self.jaw = 0
 		self.y = starty
 		self.x = startx
-		self.energy  = 10.0 #Maybe change this based on stochastic processes?	
+		self.energy  = 50.0 #Maybe change this based on stochastic processes?	
 		self.env = env
 		self.moved = False
+		self.ID = idnum;
+		self.alive = True;
 
 		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
@@ -57,21 +60,23 @@ class Animat:
 		pass
 
 	def tickStateMachine(self):
+		print "Animat ID: "+str(self.ID);
 		normalizedInputs = self.senseEnvironment();
 		# First attempt, just follow gradient
-		move = True;
+		canMove = True;
 		maxIndeces = [i for i,mymax in enumerate(normalizedInputs) if mymax == 1.0]
 		if maxIndeces:
 			randomMaxIndex = choice(maxIndeces);
 			outputs = [0,0,0,0,0];
 			outputs[randomMaxIndex] = 1;
 		else:
-			move = False;
+			canMove = False;
 		
-		if (move):
+		if (canMove):
 			self.performActions(outputs);
 			self.expendEnergy();
 
+		self.printEnergy();
 
 	@classmethod
 	def randomStart(cls,sizey,sizex):
@@ -108,32 +113,44 @@ class Animat:
 
 	def die(self):
 		Animat.count -= 1
+		self.alive = False;
 		pass #replace w/ self.env.removeAnimatFromMap()
 
 	def eat(self,foodItem):
-		foodItem.bites += 1
-		energy += self.foodToEnergyWeights[foodItem.sourceNumber] #get this much energy from eating this food
+		#foodItem.bites += 1
+		foodItem.eat();
+		print "Food size is: "+str(foodItem.size);
+		if foodItem.size == 0:
+			self.env.removeFood(foodItem.id);
+			print "Food removed from environment"
+		else:
+			#get this much energy from eating this food
+			self.energy += self.foodToEnergyWeights[foodItem.sourceNumber] 
+			print "Ate food";
 
 	def printEnergy(self):
-		print self.energy
+		print "Energy: "+str(self.energy);
 
 	def performActions(self,sensorOutput):
 		#Get the max value of the sensor output and move in that direction
 		maxVal = max(sensorOutput)
 		maxIndex = sensorOutput.index(maxVal)
 
-		print "Max value is: "
-		print maxVal
+		#print "Max value is: "
+		#print maxVal
 
-		print "Max index is: "
-		print maxIndex
+		#print "Max index is: "
+		#print maxIndex
 
 		if maxIndex == 0:
 			if self.isOnFood():
 				foodId = self.env.returnFoodIDAt(self.y,self.x)
+				print "On food..., id is: "+str(foodId);
 				if foodId != -1:
-					print "Food removed from environment"
-					self.env.removeFood(foodId)
+					# Eat!
+					self.eat(self.env.returnFood(foodId));
+					#print "Food removed from environment"
+					#self.env.removeFood(foodId)
 					#self.env.updateMap()
 
 

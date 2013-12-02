@@ -175,4 +175,11 @@ class Env:
 				return food.id
 				break
 		return -1
+
+	def returnFood(self,id):
+		for food in self.foodList:
+			if (food.id == id):
+				return food
+				break
+		return null;
 		

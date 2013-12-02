@@ -28,13 +28,16 @@ for i in range (0,10):
 env.updateMap()
 
 #Create Animat
-a = Animat(0,0,env, filename)
+ID = 1;
+a = Animat(0,0,env, filename,1)
 
 fig = plt.figure()
 ims = []
-for i in range(0,300):
+for i in range(0,100):
+	print "Tick: "+str(i);
 	env.tick()
-	a.tickStateMachine()
+	if a.alive:
+		a.tickStateMachine()
 	env.map[a.y,a.x] = env.map.max();
 	im = plt.imshow(env.map)
 	im.set_cmap('spectral')

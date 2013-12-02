@@ -10,12 +10,15 @@ class Food:
 		self.y = y;
 		self.x = x;
 		self.size = size;
+		self.sourceNumber = 0;
 		
 	def eat(self):
 		if (self.size < 0):
 			self.size -= 1
+			return True;
 		else:
 			print 'Food already gone...'
+			return False;
 		
 	def tick(self,food):
 		pass;
