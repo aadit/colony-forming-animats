@@ -7,6 +7,7 @@ from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 
 import random
+from random import choice
 import copy
 
 class Animat:
@@ -54,6 +55,23 @@ class Animat:
 		self.displayLocation()
 		#self.printEnergy()
 		pass
+
+	def tickStateMachine(self):
+		normalizedInputs = self.senseEnvironment();
+		# First attempt, just follow gradient
+		move = True;
+		maxIndeces = [i for i,mymax in enumerate(normalizedInputs) if mymax == 1.0]
+		if maxIndeces:
+			randomMaxIndex = choice(maxIndeces);
+			outputs = [0,0,0,0,0];
+			outputs[randomMaxIndex] = 1;
+		else:
+			move = False;
+		
+		if (move):
+			self.performActions(outputs);
+			self.expendEnergy();
+
 
 	@classmethod
 	def randomStart(cls,sizey,sizex):

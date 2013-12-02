@@ -34,7 +34,7 @@ fig = plt.figure()
 ims = []
 for i in range(0,300):
 	env.tick()
-	a.tick()
+	a.tickStateMachine()
 	env.map[a.y,a.x] = env.map.max();
 	im = plt.imshow(env.map)
 	im.set_cmap('spectral')
