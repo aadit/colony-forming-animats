@@ -33,7 +33,7 @@ a = Animat(0,0,env, filename,1)
 
 fig = plt.figure()
 ims = []
-for i in range(0,100):
+for i in range(0,200):
 	print "Tick: "+str(i);
 	env.tick()
 	if a.alive:

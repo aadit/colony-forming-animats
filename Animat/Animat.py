@@ -143,7 +143,9 @@ class Animat:
 		#print maxIndex
 
 		if maxIndex == 0:
+			print "perform actions says 0"
 			if self.isOnFood():
+				print "scents tell me I'm on food"
 				foodId = self.env.returnFoodIDAt(self.y,self.x)
 				print "On food..., id is: "+str(foodId);
 				if foodId != -1:

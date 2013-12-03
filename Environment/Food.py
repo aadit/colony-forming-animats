@@ -13,7 +13,7 @@ class Food:
 		self.sourceNumber = 0;
 		
 	def eat(self):
-		if (self.size < 0):
+		if (self.size > 0):
 			self.size -= 1
 			return True;
 		else:
