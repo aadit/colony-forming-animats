@@ -21,7 +21,6 @@ print 'Running Simulation - Find food'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
 env = Env(50)
-env.makeGradient()
 for i in range (0,10):
 	env.makeFoodRandom()
 	#env.makeFood(20,20);
@@ -33,7 +32,7 @@ a = Animat(0,0,env, filename,1)
 
 fig = plt.figure()
 ims = []
-for i in range(0,200):
+for i in range(0,1000):
 	print "Tick: "+str(i);
 	env.tick()
 	if a.alive:
@@ -47,7 +46,7 @@ env.tick()
 	
 print 'Finished ticking'
 
-ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
+ani = animation.ArtistAnimation(fig, ims, interval=10, blit=True,
 	repeat=False)
 plt.colorbar()
 plt.show()

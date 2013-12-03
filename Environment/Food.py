@@ -5,12 +5,12 @@
 
 class Food:
 
-	def __init__(self,id,y,x,size):
+	def __init__(self,id,y,x,size,sourceType):
 		self.id = id;
 		self.y = y;
 		self.x = x;
 		self.size = size;
-		self.sourceNumber = 0;
+		self.sourceNumber = sourceType;
 		
 	def eat(self):
 		if (self.size > 0):

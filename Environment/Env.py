@@ -13,6 +13,7 @@ class Env:
 		self.foodGeneratorList = [];
 		self.foodList = [];
 		self.foodCounter = 0;
+		self.makeGradient();
 		
 	def tick(self):
 		# the main activator for the environment
@@ -143,10 +144,10 @@ class Env:
 		# Pick a random spot on the map
 		foody = random.randrange(0,self.size)
 		foodx = random.randrange(0,self.size)
-		self.makeFood(foody,foodx)
+		self.makeFood(foody,foodx,random.randrange(0,4));
 									   			
-	def makeFood(self,foody,foodx):
-		self.foodList.append( Food(self.foodCounter,foody,foodx,10));
+	def makeFood(self,foody,foodx,sourceType):
+		self.foodList.append( Food(self.foodCounter,foody,foodx,50,sourceType));
 		self.foodCounter += 1;
 						   			
 	def removeFood(self,id):
