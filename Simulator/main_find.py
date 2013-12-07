@@ -28,14 +28,15 @@ for i in range (0,100):
 env.updateMap()
 
 #Create Animat
-a = Animat(0,0,env, filename)
+animats = [Animat(25,25,env,filename), Animat(10,40,env,filename), Animat(45,10,env,filename), Animat(30,40,env,filename)]
 
 fig = plt.figure()
 ims = []
 for i in range(0,20000):
 	env.tick()
-	a.tick()
-	env.map[a.y,a.x] = env.map.max();
+	for a in animats:
+		a.tick()
+		env.map[a.y,a.x] = env.map.max();
 	im = plt.imshow(env.map)
 	im.set_cmap('spectral')
 	ims.append([im])

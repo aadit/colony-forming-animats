@@ -225,14 +225,14 @@ class Animat:
 	def eatFood(self,foodItem):
 		#foodItem.bites += 1
 		foodItem.eat();
-		print "Food size is: "+str(foodItem.size);
+		#print "Food size is: "+str(foodItem.size);
 		if foodItem.size == 0:
 			self.env.removeFood(foodItem.id);
 			print "Food removed from environment"
 		else:
 			#get this much energy from eating this food
 			self.energy += self.foodToEnergyWeights[foodItem.sourceNumber] 
-			print "Ate food";
+			#print "Ate food";
 
 	def printEnergy(self):
 		print "Energy: "+str(self.energy);
