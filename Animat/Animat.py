@@ -20,8 +20,8 @@ class Animat:
 	actions = ['north', 'south', 'east','west','stay','eat','pickup','drop']
 
 	#Animat Parameter Constants
-	LIVING_COST 	= 0.1 # Metabolic cost
-	MOVEMENT_COST	= 1.0 # Cost to move one unit
+	LIVING_COST 	= 0.01 # Metabolic cost
+	MOVEMENT_COST	= 0.01	 # Cost to move one unit
 	EATING_REWARD   = 10.0 # Reward for eating one food source
 
 	def __init__(self,starty,startx, env, filename, idnum = 1):
@@ -56,9 +56,11 @@ class Animat:
 
 	def tick(self):
 		#qLearn.
+		self.reward = 0
 		currentState  = self.getState()
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
+		self.reward -= Animat.LIVING_COST
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, self.reward, nextState) #update the Q Table
 
