@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 #from numpy import *
+import random
 
 class QLearn:
 

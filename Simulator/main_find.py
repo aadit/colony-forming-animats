@@ -22,7 +22,7 @@ filename = 'nn_precise_100k.p'
 #Init Environment and food sources
 env = Env(50)
 env.makeGradient()
-for i in range (0,10):
+for i in range (0,100):
 	env.makeFoodRandom()
 	#env.makeFood(20,20);
 env.updateMap()
@@ -32,7 +32,7 @@ a = Animat(0,0,env, filename)
 
 fig = plt.figure()
 ims = []
-for i in range(0,300):
+for i in range(0,20000):
 	env.tick()
 	a.tick()
 	env.map[a.y,a.x] = env.map.max();
@@ -44,7 +44,7 @@ env.tick()
 	
 print 'Finished ticking'
 
-ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
+ani = animation.ArtistAnimation(fig, ims, interval=5, blit=True,
 	repeat=False)
 plt.colorbar()
 plt.show()
