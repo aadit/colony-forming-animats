@@ -6,6 +6,7 @@ from Environment.Env import Env
 from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, FullConnection
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
+import numpy
 
 import random
 from random import choice
@@ -19,25 +20,25 @@ class Animat:
 	energyThreshold = 80
 	actions = ['north', 'south', 'east','west','stay','eat','pickup','drop']
 
-	#Animat Parameter Constants
-	LIVING_COST 	= 0.01 # Metabolic cost
-	MOVEMENT_COST	= 0.01	 # Cost to move one unit
-	EATING_REWARD   = 10.0 # Reward for eating one food source
-
 	def __init__(self,starty,startx, env, filename, idnum = 1):
 
 		#Initialize instance parameters
 		self.y = starty
 		self.x = startx
-		self.energy  = 50.0 #Maybe change this based on stochastic processes?	
 		self.env = env;
-		self.moved = False
 		self.ID = idnum;
-		self.alive = True;
-		self.energy1 = 50
-		self.energy2 = 50
-		self.holding = [-1, -1];
+		self.energy = [50, 50]
+		self.maxEnergy = [100, 100]
+		self.previousEnergy = copy(self.energy)
+		self.energyUsageRate = [0.5, 0.5]
+
+		self.holding = [-1, -1]
 		self.reward = 0
+
+		#Initialize flags
+		self.moved = (False, )
+		self.alive = True
+
 
 		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
@@ -169,7 +170,7 @@ class Animat:
 		if self.env[0].canMove(self.y,self.x,newy,newx):
 			self.y = newy
 			self.x = newx
-			self.reward -= Animat.MOVEMENT_COST
+			self.moved = True
 			
 	def pickupAnything(self):
 		# Go through the food types
@@ -296,5 +297,32 @@ class Animat:
 				return 'eat';
 			else:
 				return 'notholding';
+
+
+	#reset flags for next iteration
+	def resetFlags(self):
+		self.moved = False
+		self.followedGradient = False
+
+	def rewardFunction(self):
+
+		#Animat Parameter Constants
+		LIVING_COST     = 1.0
+		MOVEMENT_COST	= 0.01	 # Cost to move one unit
+		EATING_REWARD   = 10.0 # Reward for eating one food source
+
+		extraRewards = 0 #Keep track of extra rewards that this animat achieves (kinda like achievements when playing games)
+		previousEnergy = copy(self.energy)
+
+		#Figure out which food source you were to follow
+		energyTillMax = [y - x for x,y in zip(self.energy, self.maxEnergy)]
+		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTillMax)]
+		maxFollowValue = max(satiation)
+		foodSourcesToFollow = [i for i, mymax in enumerate(maxFollowValues) if mymax ==  maxFollowValue]
+
+		#Subtract living cost and movement cost for each energy rate
+		self.energy = [ currEnergy - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy,rate in zip(self.energy, self.energyUsageRate)]
+
+
 
 		
