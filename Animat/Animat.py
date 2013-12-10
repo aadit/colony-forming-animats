@@ -313,8 +313,10 @@ class Animat:
 		foodSourcesToFollow = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
 
 		#print "Foods eaten: ", self.foodsEaten
+		
 		#Subtract living cost and movement cost for each energy rate
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
+		self.energy = [ min(currEnergy, maxEnergy) for currEnergy, maxEnergy in zip(self.energy,self.maxEnergy)] #Limit energy to max energy
 		
 		#Determine a reward multiplier if eating multiple foods
 		numFoodEaten = self.foodsEaten.count(1)
