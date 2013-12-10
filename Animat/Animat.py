@@ -92,13 +92,13 @@ class Animat:
 			pass
 
 		if action == 'eat':
-			self.eat()
+			self.eatAnything()
 
 		if action == 'pickup':
-			self.pickup()
+			self.pickupAnything()
 
 		if action == 'drop':
-			self.drop()
+			self.dropAnything()
 
 		if (self.holding[0] >= 0):
 			# move the food I'm holding
@@ -114,8 +114,8 @@ class Animat:
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
 		
-		foodgradient1 = self.senseEnvironment(1)  
-		foodgradient2 = self.senseEnvironment(2) 
+		foodgradient1 = self.senseEnvironment(0)  
+		foodgradient2 = self.senseEnvironment(1) 
 
 		# temp states, just for example
 		# in reality, this stuff will come from the animat itself
@@ -126,7 +126,9 @@ class Animat:
 		#total *= 10;
 		total += 1 if (self.holding[0] > 0) else 0;
 		total *= 10;
-		total += 1 if (self.isOnFood()) else 0;
+		total += 1 if (self.isOnFood(0)) else 0;
+		total *= 10;
+		total += 1 if (self.isOnFood(1)) else 0;
 		
 		# Food gradient choices are 4, can be represented by 2 bits
 		total *= 10;
@@ -169,21 +171,37 @@ class Animat:
 			self.x = newx
 			self.reward -= Animat.MOVEMENT_COST
 			
+	def pickupAnything(self):
+		# Go through the food types
+		for foodType in range(0,1+1):
+			if self.pickup(foodType):
+				return;
 
 	def pickup(self,foodType):
-		foodID = self.env[foodType].returnFoodIDAt(self.y,self.x);
-		if foodID != -1:
-			# There is food here. Can we pick it up?
-			if self.env[foodType].returnFood(foodID).pickUp():
-				# We successfully picked it up
-				self.holding[foodType] = self.env[foodType].returnFoodIDAt(self.y,self.x)
-		#manipulate env to move food @ FoodID on map
+		# Check to see if we're holding anything already.
+		# Enforce holding one item at a time.
+		if not max(self.holding) == -1:
+			foodID = self.env[foodType].returnFoodIDAt(self.y,self.x);
+			if foodID != -1:
+				# There is food here. Can we pick it up?
+				if self.env[foodType].returnFood(foodID).pickUp():
+					# We successfully picked it up
+					self.holding[foodType] = self.env[foodType].returnFoodIDAt(self.y,self.x)
+					return True;
+		return False;
+
+	def dropAnything(self):
+		# Drop whatever we're holding
+		for foodType in range(0,1+1):
+			if self.drop(foodType):
+				return;
 
 	def drop(self,foodType):
 		if self.holding[foodType] != -1:
 			self.env[foodType].returnFood(self.holding[foodType]).drop();
 			self.holding[foodType] = -1;
-		#manipulate env to keep food @ FoodID static on map
+			return True;
+		return False;
 
 	def expendEnergy(self):
 		if self.moved:
@@ -201,6 +219,11 @@ class Animat:
 		self.alive = False;
 		pass #replace w/ self.env.removeAnimatFromMap()
 
+	def eatAnything(self):
+		for foodType in range(0,1+1):
+			if self.eat(foodType):
+				return;
+
 	def eat(self,foodType):
 		foodId = self.env[foodType].returnFoodIDAt(self.y, self.x)
 		if foodId >= 0:
@@ -208,6 +231,8 @@ class Animat:
 			if not foodItem.held:
 				self.eatFood(foodItem,foodType)
 				self.reward += Animat.EATING_REWARD
+				return True;
+		return False;
 
 	def eatFood(self,foodItem,foodType):
 		foodItem.eat();

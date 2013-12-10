@@ -20,30 +20,38 @@ print 'Running Simulation - Find food'
 #filename = 'nn_scents_based.p'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
-env = Env(50)
-env.makeGradient()
-for i in range (0,100):
-	env.makeFoodRandom()
-	#env.makeFood(20,20);
-env.updateMap()
+env = [Env(50),Env(50)];
+for e in env:
+	e.makeGradient()
+	for i in range (0,50):
+		e.makeFoodRandom()
+	e.updateMap()
 
 #Create Animat
-animats = [Animat(25,25,env,filename), Animat(10,40,env,filename), Animat(45,10,env,filename), Animat(30,40,env,filename)]
+animats = [Animat(25,25,env,filename), 
+			Animat(10,40,env,filename), 
+			Animat(45,10,env,filename), 
+			Animat(30,40,env,filename)]
 
 fig = plt.figure()
 ims = []
 for i in range(0,20000):
-	env.tick()
+	for e in env:
+		e.tick()
 	for a in animats:
 		a.tick()
-		env.map[a.y,a.x] = env.map.max();
+		for e in env:
+			e.map[a.y,a.x] = e.map.max();
 	if i % 100 == 0:
-		print 'Tick: '+str(i);
-		im = plt.imshow(env.map)
+		for e in env:
+			im = plt.imshow(e.map)
 		im.set_cmap('spectral')
 		ims.append([im])
+	if i % 1000 == 0:
+		print 'Tick: '+str(i);
 
-env.tick()
+for e in env:
+	e.tick()
 	
 print 'Finished ticking'
 
@@ -52,7 +60,7 @@ ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 plt.colorbar()
 plt.show()
 
-print 'Saving animation...'
+#print 'Saving animation...'
 #ani.save('search_and_destroy.mp4')
 
 
