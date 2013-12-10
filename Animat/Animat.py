@@ -38,6 +38,7 @@ class Animat:
 		self.energy2 = 50
 		self.holding = [-1, -1];
 		self.reward = 0
+		self.foodType = [0,1];
 
 		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
@@ -60,14 +61,12 @@ class Animat:
 		currentState  = self.getState()
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
-		if (self.holding[0] >= 0):
-			# move the food I'm holding
-			self.env.returnFood(self.holding[0]).y = self.y;
-			self.env.returnFood(self.holding[0]).x = self.x;
-		elif (self.holding[1] >= 0):
-			# move the food I'm holding
-			self.env.returnFood(self.holding[1]).y = self.y;
-			self.env.returnFood(self.holding[1]).x = self.x;
+		for f in self.foodType:
+			if (self.holding[f] >= 0):
+				# move the food I'm holding
+				self.env[f].returnFood(self.holding[f]).y = self.y;
+				self.env[f].returnFood(self.holding[f]).x = self.x;
+				break;
 		self.reward -= Animat.LIVING_COST
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, self.reward, nextState) #update the Q Table
@@ -100,16 +99,6 @@ class Animat:
 		if action == 'drop':
 			self.dropAnything()
 
-		if (self.holding[0] >= 0):
-			# move the food I'm holding
-			self.env[0].returnFood(self.holding[0]).y = self.y;
-			self.env[0].returnFood(self.holding[0]).x = self.x;
-		elif (self.holding[1] >= 0):
-			# move the food I'm holding
-			self.env[1].returnFood(self.holding[1]).y = self.y;
-			self.env[1].returnFood(self.holding[1]).x = self.x;
-
-
 	def getState(self):
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
@@ -124,7 +113,9 @@ class Animat:
 		#total *= 10;
 		#total += 1 if (self.energy2 < Animat.energyThreshold) else 0;
 		#total *= 10;
-		total += 1 if (self.holding[0] > 0) else 0;
+		total += 1 if (self.holding[self.foodType[0]] > 0) else 0;
+		total *= 10;
+		total += 1 if (self.holding[self.foodType[1]] > 0) else 0;
 		total *= 10;
 		total += 1 if (self.isOnFood(0)) else 0;
 		total *= 10;
@@ -142,16 +133,16 @@ class Animat:
 		elif (foodgradient1 == 'east'):
 			total += 11;
 			
-		#total *= 10;
-		#total *= 10;
-		#if (foodgradient2 == 'north'):
-		#	total += 0;
-		#elif (foodgradient2 == 'south'):
-		#	total += 1;
-		#elif (foodgradient2 == 'west'):
-		#	total += 10;
-		#elif (foodgradient2 == 'east'):
-		#	total += 11;
+		total *= 10;
+		total *= 10;
+		if (foodgradient2 == 'north'):
+			total += 0;
+		elif (foodgradient2 == 'south'):
+			total += 1;
+		elif (foodgradient2 == 'west'):
+			total += 10;
+		elif (foodgradient2 == 'east'):
+			total += 11;
 			
 		return int(str(total),2);
 
@@ -224,6 +215,15 @@ class Animat:
 			if self.eat(foodType):
 				return;
 
+	def eatAll(self):
+		foodsEaten = [];
+		for foodType in range(0,1+1):
+			if self.eat(foodType):
+				foodsEaten.append(1);
+			else:
+				foodsEaten.append(0);
+		return foodsEaten;
+
 	def eat(self,foodType):
 		foodId = self.env[foodType].returnFoodIDAt(self.y, self.x)
 		if foodId >= 0:
@@ -274,26 +274,32 @@ class Animat:
 
 	def followGradient(self,stateMachine,toEat,toFollow):
 		if stateMachine == 'notholding':
-			self.performQLearnAction(self.senseEnvironment(0));
+			self.dropAnything();
+			self.performQLearnAction(self.senseEnvironment(toEat));
 			if self.isOnFood(toEat):
 				if self.pickup(toEat):
 					return 'holding'
 				else:
-					return 'pickupfail';
+					return 'fail';
 			return 'notholding'
 		elif stateMachine == 'holding':
-			self.performQLearnAction(self.senseEnvironment(1));
+			self.performQLearnAction(self.senseEnvironment(toFollow));
 			if self.isOnFood(toFollow):
 				if self.drop(toEat):
 					return 'eat'
 			return 'holding'
 		elif stateMachine == 'eat':
-			if self.isOnFood(toEat):
-				self.eat(toEat);
-				return 'eat';
-			elif self.isOnFood(toFollow):
-				self.eat(toFollow);
-				return 'eat';
+			#if self.isOnFood(toEat):
+			#	self.eat(toEat);
+			#	return 'eat';
+			#elif self.isOnFood(toFollow):
+			#	self.eat(toFollow);
+			#	return 'eat';
+			if self.isOnFood(toEat) or self.isOnFood(toFollow):
+				if not max(self.eatAll()) == 0:
+					return 'eat';
+				else:
+					return 'fail'
 			else:
 				return 'notholding';
 

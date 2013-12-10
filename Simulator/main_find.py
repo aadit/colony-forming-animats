@@ -23,7 +23,7 @@ filename = 'nn_precise_100k.p'
 env = [Env(50),Env(50)];
 for e in env:
 	e.makeGradient()
-	for i in range (0,50):
+	for i in range (0,100):
 		e.makeFoodRandom()
 	e.updateMap()
 
@@ -35,7 +35,7 @@ animats = [Animat(25,25,env,filename),
 
 fig = plt.figure()
 ims = []
-for i in range(0,20000):
+for i in range(0,50000):
 	for e in env:
 		e.tick()
 	for a in animats:
