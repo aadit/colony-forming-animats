@@ -11,6 +11,7 @@ class Food:
 		self.x = x;
 		self.size = size;
 		self.sourceNumber = sourceType;
+		self.held = False;
 		
 	def eat(self):
 		if (self.size > 0):
@@ -22,4 +23,12 @@ class Food:
 		
 	def tick(self,food):
 		pass;
-			
+	
+	def pickUp(self):
+		if self.held:
+			return False;
+		self.held = True;
+		return True;
+
+	def drop(self):
+		self.held = False;

@@ -37,15 +37,17 @@ for i in range(0,20000):
 	for a in animats:
 		a.tick()
 		env.map[a.y,a.x] = env.map.max();
-	im = plt.imshow(env.map)
-	im.set_cmap('spectral')
-	ims.append([im])
+	if i % 100 == 0:
+		print 'Tick: '+str(i);
+		im = plt.imshow(env.map)
+		im.set_cmap('spectral')
+		ims.append([im])
 
 env.tick()
 	
 print 'Finished ticking'
 
-ani = animation.ArtistAnimation(fig, ims, interval=5, blit=True,
+ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 	repeat=False)
 plt.colorbar()
 plt.show()

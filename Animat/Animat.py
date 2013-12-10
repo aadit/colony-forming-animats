@@ -30,13 +30,13 @@ class Animat:
 		self.y = starty
 		self.x = startx
 		self.energy  = 50.0 #Maybe change this based on stochastic processes?	
-		self.env = env
+		self.env = env;
 		self.moved = False
 		self.ID = idnum;
 		self.alive = True;
 		self.energy1 = 50
 		self.energy2 = 50
-		self.holding = -1
+		self.holding = [-1, -1];
 		self.reward = 0
 
 		#Initialize threshold parameters
@@ -60,22 +60,17 @@ class Animat:
 		currentState  = self.getState()
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
+		if (self.holding[0] >= 0):
+			# move the food I'm holding
+			self.env.returnFood(self.holding[0]).y = self.y;
+			self.env.returnFood(self.holding[0]).x = self.x;
+		elif (self.holding[1] >= 0):
+			# move the food I'm holding
+			self.env.returnFood(self.holding[1]).y = self.y;
+			self.env.returnFood(self.holding[1]).x = self.x;
 		self.reward -= Animat.LIVING_COST
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, self.reward, nextState) #update the Q Table
-
-		#OLD TICK:
-		#normalizedInputs = self.senseEnvironment() #Sense Environment
-		#output = self.neuralNet.activate(normalizedInputs) #Propagate Neural Net
-		#print "Normalized Inputs are: "
-		#print normalizedInputs
-		#print "Output Neuron State is:"
-		#print output
-		#self.performActions(output.tolist()) #Perform Actions based on outputs
-		#self.expendEnergy()
-		#self.displayLocation()
-		#self.printEnergy()
-		#pass
 
 	#Perform action based on input action. Should return the integer value
 	#of the +/- reward experienced from performing the action
@@ -88,10 +83,10 @@ class Animat:
 			self.move(self.y + 1, self.x)
 
 		if action == 'east':
-			self.move(self.y, self.x - 1)
+			self.move(self.y, self.x + 1)
 
 		if action == 'west':
-			self.move(self.y,self.x + 1)
+			self.move(self.y,self.x - 1)
 
 		if action == 'stay':
 			pass
@@ -104,6 +99,15 @@ class Animat:
 
 		if action == 'drop':
 			self.drop()
+
+		if (self.holding[0] >= 0):
+			# move the food I'm holding
+			self.env[0].returnFood(self.holding[0]).y = self.y;
+			self.env[0].returnFood(self.holding[0]).x = self.x;
+		elif (self.holding[1] >= 0):
+			# move the food I'm holding
+			self.env[1].returnFood(self.holding[1]).y = self.y;
+			self.env[1].returnFood(self.holding[1]).x = self.x;
 
 
 	def getState(self):
@@ -120,7 +124,7 @@ class Animat:
 		#total *= 10;
 		#total += 1 if (self.energy2 < Animat.energyThreshold) else 0;
 		#total *= 10;
-		total += 1 if (self.holding > 0) else 0;
+		total += 1 if (self.holding[0] > 0) else 0;
 		total *= 10;
 		total += 1 if (self.isOnFood()) else 0;
 		
@@ -149,26 +153,6 @@ class Animat:
 			
 		return int(str(total),2);
 
-
-	def tickStateMachine(self):
-		print "Animat ID: "+str(self.ID);
-		normalizedInputs = self.senseEnvironment();
-		# First attempt, just follow gradient
-		canMove = True;
-		maxIndeces = [i for i,mymax in enumerate(normalizedInputs) if mymax == 1.0]
-		if maxIndeces:
-			randomMaxIndex = choice(maxIndeces);
-			outputs = [0,0,0,0,0];
-			outputs[randomMaxIndex] = 1;
-		else:
-			canMove = False;
-		
-		if (canMove):
-			self.performActions(outputs);
-			self.expendEnergy();
-
-		self.printEnergy();
-
 	@classmethod
 	def randomStart(cls,sizey,sizex):
 		# Given the size of the environment, start at random location
@@ -180,18 +164,25 @@ class Animat:
 		print "y is " + str(self.y) + ", x is " + str(self.x)
 		
 	def move(self,newy,newx):
-		if self.env.canMove(self.y,self.x,newy,newx):
+		if self.env[0].canMove(self.y,self.x,newy,newx):
 			self.y = newy
 			self.x = newx
 			self.reward -= Animat.MOVEMENT_COST
 			
 
-	def pickup(self):
-		self.holding = self.env.returnFoodIDAt(self.y,self.x)
+	def pickup(self,foodType):
+		foodID = self.env[foodType].returnFoodIDAt(self.y,self.x);
+		if foodID != -1:
+			# There is food here. Can we pick it up?
+			if self.env[foodType].returnFood(foodID).pickUp():
+				# We successfully picked it up
+				self.holding[foodType] = self.env[foodType].returnFoodIDAt(self.y,self.x)
 		#manipulate env to move food @ FoodID on map
 
-	def drop(self):
-		self.holding = -1
+	def drop(self,foodType):
+		if self.holding[foodType] != -1:
+			self.env[foodType].returnFood(self.holding[foodType]).drop();
+			self.holding[foodType] = -1;
 		#manipulate env to keep food @ FoodID static on map
 
 	def expendEnergy(self):
@@ -210,75 +201,28 @@ class Animat:
 		self.alive = False;
 		pass #replace w/ self.env.removeAnimatFromMap()
 
-	def eat(self):
-		#check spot and get food sources
-		#for each food in food list
-		foodId = self.env.returnFoodIDAt(self.y, self.x)
-
+	def eat(self,foodType):
+		foodId = self.env[foodType].returnFoodIDAt(self.y, self.x)
 		if foodId >= 0:
-			foodItem = self.env.returnFood(foodId)
-			self.eatFood(foodItem)
-			self.reward += Animat.EATING_REWARD
+			foodItem = self.env[foodType].returnFood(foodId)
+			if not foodItem.held:
+				self.eatFood(foodItem,foodType)
+				self.reward += Animat.EATING_REWARD
 
-
-		#set flags for each food source
-
-
-	def eatFood(self,foodItem):
-		#foodItem.bites += 1
+	def eatFood(self,foodItem,foodType):
 		foodItem.eat();
-		#print "Food size is: "+str(foodItem.size);
 		if foodItem.size == 0:
-			self.env.removeFood(foodItem.id);
+			self.env[foodType].removeFood(foodItem.id);
 			print "Food removed from environment"
 		else:
-			#get this much energy from eating this food
 			self.energy += self.foodToEnergyWeights[foodItem.sourceNumber] 
-			#print "Ate food";
 
 	def printEnergy(self):
 		print "Energy: "+str(self.energy);
 
-	def performActions(self,sensorOutput):
-		#Get the max value of the sensor output and move in that direction
-		maxVal = max(sensorOutput)
-		maxIndex = sensorOutput.index(maxVal)
-
-		#print "Max value is: "
-		#print maxVal
-
-		#print "Max index is: "
-		#print maxIndex
-
-		if maxIndex == 0:
-			if self.isOnFood():
-				foodId = self.env.returnFoodIDAt(self.y,self.x)
-				print "On food..., id is: "+str(foodId);
-				if foodId != -1:
-					# Eat!
-					self.eat(self.env.returnFood(foodId));
-					#print "Food removed from environment"
-					#self.env.removeFood(foodId)
-					#self.env.updateMap()
-
-
-		elif maxIndex == 1:
-			self.move(self.y, self.x + 1)
-
-		elif maxIndex == 2:
-			self.move(self.y, self.x - 1)
-
-		elif maxIndex == 3:
-			self.move(self.y - 1, self.x)
-
-		elif maxIndex == 4:
-			self.move(self.y + 1, self.x)
-
 
 	def senseEnvironment(self, foodType):
-
-		inputValues = self.env.getScentsCEWNS(self.y,self.x, foodType)
-
+		inputValues = self.env[foodType].getScentsCEWNS(self.y,self.x)
 		maxVal = max(inputValues)
 		maxIndeces = [i for i, mymax in enumerate(inputValues) if mymax == maxVal]
 		if maxIndeces:
@@ -302,20 +246,34 @@ class Animat:
 		return state
 
 
-	def isOnFood(self):
-		id = self.env.returnFoodIDAt(self.y,self.x)
+	def isOnFood(self,foodType):
+		id = self.env[foodType].returnFoodIDAt(self.y,self.x)
 		if id != -1:
 			return True
 
 		return False
 
+	def followGradient(self,stateMachine):
+		if stateMachine == 'notholding':
+			self.performQLearnAction(self.senseEnvironment(0));
+			if self.isOnFood(0):
+				self.pickup(0);
+				return 'holding'
+			return 'notholding'
+		elif stateMachine == 'holding':
+			self.performQLearnAction(self.senseEnvironment(1));
+			if self.isOnFood(1):
+				self.drop(0);
+				return 'eat'
+			return 'holding'
+		elif stateMachine == 'eat':
+			if self.isOnFood(0):
+				self.eat(0);
+				return 'eat';
+			elif self.isOnFood(1):
+				self.eat(1);
+				return 'eat';
+			else:
+				return 'notholding';
 
-
-
-
-
-
-
-
-		
 		

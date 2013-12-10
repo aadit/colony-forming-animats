@@ -22,44 +22,35 @@ class Env:
 			fg.tick(self)
 		self.updateMap();
 		
-	def getScentsCEWNS(self,animaty,animatx,foodType):
+	def getScentsCEWNS(self,animaty,animatx):
 		# Given an animat's position, return the 5 "scents" around it.
 		# NWSEC stand for North, West, South, East, and Center
 		# The values will be returned in this order
 		
 		inputValues = [];
 		mapSize = self.size;
-		inputValues.append(self.map[animaty][animatx])
+		currentFoodMap = self.map;
+		inputValues.append(currentFoodMap[animaty][animatx])
 
-		#Append value sensed at right square
 		if animatx + 1 >= mapSize:
 			inputValues.append(0)
-
 		else:
-			inputValues.append(self.map[animaty][animatx + 1])
+			inputValues.append(currentFoodMap[animaty][animatx + 1])
 
-		#Append value sensed at left square
 		if animatx - 1 < 0:
 			inputValues.append(0)
-
 		else:
-			inputValues.append(self.map[animaty][animatx - 1])
+			inputValues.append(currentFoodMap[animaty][animatx - 1])
 
-
-		#Append value sensed at top square
-		# CHANGE - Towards origin
 		if animaty - 1 < 0:
 			inputValues.append(0)
-
 		else:
-			inputValues.append(self.map[animaty - 1][animatx])
+			inputValues.append(currentFoodMap[animaty - 1][animatx])
 
-		# CHNANGE - away from origin
 		if animaty + 1 >= mapSize:
 			inputValues.append(0)
-
 		else:
-			inputValues.append(self.map[animaty + 1][animatx])
+			inputValues.append(currentFoodMap[animaty + 1][animatx])
 		
 		return inputValues;
 		
@@ -80,7 +71,7 @@ class Env:
 		#print 'gradStartX: '+str(gradStartX)
 		#print 'self.size: '+str(self.size)
 		
-		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
+		self.map = 	self.map + (self.gradient[gradStartY:gradStartY + self.size ,
 							   			gradStartX:gradStartX + self.size ])
 		
 	def updateMap(self):
