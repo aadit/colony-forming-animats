@@ -180,7 +180,7 @@ class Animat:
 	def pickup(self,foodType):
 		# Check to see if we're holding anything already.
 		# Enforce holding one item at a time.
-		if not max(self.holding) == -1:
+		if max(self.holding) == -1:
 			foodID = self.env[foodType].returnFoodIDAt(self.y,self.x);
 			if foodID != -1:
 				# There is food here. Can we pick it up?
@@ -252,19 +252,14 @@ class Animat:
 		maxIndeces = [i for i, mymax in enumerate(inputValues) if mymax == maxVal]
 		if maxIndeces:
 			maxIndex = choice(maxIndeces)
-
 		if maxIndex == 0:
 			state = 'center'
-
 		if maxIndex == 1:
 			state = 'east'
-
 		if maxIndex == 2:
 			state = 'west'
-
 		if maxIndex == 3:
 			state = 'north'
-
 		if maxIndex == 4:
 			state = 'south'
 
@@ -275,28 +270,29 @@ class Animat:
 		id = self.env[foodType].returnFoodIDAt(self.y,self.x)
 		if id != -1:
 			return True
-
 		return False
 
-	def followGradient(self,stateMachine):
+	def followGradient(self,stateMachine,toEat,toFollow):
 		if stateMachine == 'notholding':
 			self.performQLearnAction(self.senseEnvironment(0));
-			if self.isOnFood(0):
-				self.pickup(0);
-				return 'holding'
+			if self.isOnFood(toEat):
+				if self.pickup(toEat):
+					return 'holding'
+				else:
+					return 'pickupfail';
 			return 'notholding'
 		elif stateMachine == 'holding':
 			self.performQLearnAction(self.senseEnvironment(1));
-			if self.isOnFood(1):
-				self.drop(0);
-				return 'eat'
+			if self.isOnFood(toFollow):
+				if self.drop(toEat):
+					return 'eat'
 			return 'holding'
 		elif stateMachine == 'eat':
-			if self.isOnFood(0):
-				self.eat(0);
+			if self.isOnFood(toEat):
+				self.eat(toEat);
 				return 'eat';
-			elif self.isOnFood(1):
-				self.eat(1);
+			elif self.isOnFood(toFollow):
+				self.eat(toFollow);
 				return 'eat';
 			else:
 				return 'notholding';

@@ -32,11 +32,17 @@ stateMachine = ['notholding','notholding'];
 
 fig = plt.figure()
 ims = []
+
+toEat = random.randrange(0,2);
+toFollow = 0 if toEat == 1 else 1;
 for i in range(0,2000):
 	env1.tick()
 	env2.tick()
 	for index,a in enumerate(animats):
-		stateMachine[index] = a.followGradient(stateMachine[index]);
+		if stateMachine[index] == 'pickupfail':
+			toEat = random.randrange(0,2);
+			toFollow = 0 if toEat == 1 else 1;
+		stateMachine[index] = a.followGradient(stateMachine[index],toEat,toFollow);
 		env1.map[a.y,a.x] = env1.map.max();
 		env2.map[a.y,a.x] = env2.map.max();
 	#if i % 100 == 0:
