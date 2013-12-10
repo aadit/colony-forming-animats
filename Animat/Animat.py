@@ -26,15 +26,15 @@ class Animat:
 		#Initialize instance parameters
 		self.y = starty
 		self.x = startx
-		self.env = env;
-		self.ID = idnum;
-		self.foodType = [0,1];
-		self.energy = [50] * len(self.foodType)
-		self.maxEnergy = [100] * len(self.foodType)
-		self.previousEnergy = copy(self.energy)
-		self.energyUsageRate = [0.5] * len(self.foodType)
-		self.foodsEaten = [0] * len(self.foodType)
-		self.holding = [-1] * len(self.foodType)
+		self.env = env
+		self.ID = idnum
+		self.foodTypes = [0,1]
+		self.energy = [50] * len(self.foodTypes)
+		self.maxEnergy = [100] * len(self.foodTypes)
+		self.previousEnergy = copy.copy(self.energy)
+		self.energyUsageRate = [0.5] * len(self.foodTypes)
+		self.foodsEaten = [0] * len(self.foodTypes)
+		self.holding = [-1] * len(self.foodTypes)
 
 		#Initialize flags
 		self.moved = (False, 0) #if animat moved and direction animat moved in
@@ -59,8 +59,10 @@ class Animat:
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
 		reward = self.getReward() #update energies and get the reward after performing action
+		#print "Reward is:", reward
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, reward, nextState) #update the Q Table
+		self.resetFlags()
 
 	#Perform action based on input action. Should return the integer value
 	#of the +/- reward experienced from performing the action
@@ -104,9 +106,9 @@ class Animat:
 		#total *= 10;
 		#total += 1 if (self.energy2 < Animat.energyThreshold) else 0;
 		#total *= 10;
-		total += 1 if (self.holding[self.foodType[0]] > 0) else 0;
+		total += 1 if (self.holding[self.foodTypes[0]] > 0) else 0;
 		total *= 10;
-		total += 1 if (self.holding[self.foodType[1]] > 0) else 0;
+		total += 1 if (self.holding[self.foodTypes[1]] > 0) else 0;
 		total *= 10;
 		total += 1 if (self.isOnFood(0)) else 0;
 		total *= 10;
@@ -151,8 +153,8 @@ class Animat:
 		if self.env[0].canMove(self.y,self.x,newy,newx):
 			self.y = newy
 			self.x = newx
-			self.moved = True
-			for f in self.foodType:
+			self.moved = (True,0)
+			for f in self.foodTypes:
 				if (self.holding[f] >= 0):
 					# move the food I'm holding
 					self.env[f].returnFood(self.holding[f]).y = self.y;
@@ -161,7 +163,7 @@ class Animat:
 			
 	def pickupAnything(self):
 		# Go through the food types
-		for foodType in enumerate(self.foodTypes):
+		for i,foodType in enumerate(self.foodTypes):
 			if self.pickup(foodType):
 				return;
 
@@ -180,7 +182,7 @@ class Animat:
 
 	def dropAnything(self):
 		# Drop whatever we're holding
-		for foodType in enumerate(self.foodTypes):
+		for i,foodType in enumerate(self.foodTypes):
 			if self.drop(foodType):
 				return;
 
@@ -197,7 +199,7 @@ class Animat:
 		pass #replace w/ self.env.removeAnimatFromMap()
 
 	def eatAnything(self):
-		for foodType in enumerate(self.foodTypes):
+		for i,foodType in enumerate(self.foodTypes):
 			if self.eat(foodType):
 				return;
 
@@ -224,8 +226,6 @@ class Animat:
 		if foodItem.size == 0:
 			self.env[foodType].removeFood(foodItem.id);
 			print "Food removed from environment"
-		else:
-			self.energy += self.foodToEnergyWeights[foodItem.sourceNumber] 
 
 	def printEnergy(self):
 		print "Energy: "+str(self.energy);
@@ -291,36 +291,39 @@ class Animat:
 
 	#reset flags for next iteration
 	def resetFlags(self):
-		self.moved = (False, 'stay')
+		self.moved = (False, 0)
 		self.followedGradient = False
+		self.foodsEaten = [0] * len(self.foodTypes)
 
 	def getReward(self):
 
 		#Animat Parameter Constants
 		LIVING_COST     = 1.0
 		MOVEMENT_COST	= 0.01	 # Cost to move one unit
-		EATING_REWARD   = 10.0   # Reward for eating one food source
-		EATING_MULT_REWARD = 10.0
+		EATING_REWARD   = 3.0   # Reward for eating one food source
+		EATING_MULT_REWARD = 100.0
 
-		rewardMultiplier = 1 #Multiply positive rewards when doing things like eating multiple food sources
-		previousEnergy = copy(self.energy)
+		rewardsMultiplier = 1 #Multiply positive rewards when doing things like eating multiple food sources
+		previousEnergy = copy.copy(self.energy)
 
 		#Figure out which food source you were to follow
 		energyTillMax = [y - x for x,y in zip(self.energy, self.maxEnergy)]
 		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTillMax)]
 		maxFollowValue = max(satiation)
-		foodSourcesToFollow = [i for i, mymax in enumerate(maxFollowValues) if mymax ==  maxFollowValue]
+		foodSourcesToFollow = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
 
+		#print "Foods eaten: ", self.foodsEaten
 		#Subtract living cost and movement cost for each energy rate
-		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
+		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
 		
 		#Determine a reward multiplier if eating multiple foods
 		numFoodEaten = self.foodsEaten.count(1)
 		if numFoodEaten > 1:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
+			print "Ate multiple food sources!"
 
 		#Compute delta energy for each energy bucket
-		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnery in zip(self.energy, previousEnergy)]
+		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnergy in zip(self.energy, previousEnergy)]
 
 		netDeltaEnergy = sum(deltaEnergy)
 
