@@ -15,6 +15,7 @@ import copy
 class Animat:
 
 	#Class Parameters
+	energyPerTick = [[]]
 	count = 0
 	ID = -1;
 	energyThreshold = 80
@@ -27,26 +28,22 @@ class Animat:
 		self.x = startx
 		self.env = env;
 		self.ID = idnum;
-		self.energy = [50, 50]
-		self.maxEnergy = [100, 100]
-		self.previousEnergy = copy(self.energy)
-		self.energyUsageRate = [0.5, 0.5]
-
-		self.holding = [-1, -1]
-		self.reward = 0
 		self.foodType = [0,1];
+		self.energy = [50] * len(self.foodType)
+		self.maxEnergy = [100] * len(self.foodType)
+		self.previousEnergy = copy(self.energy)
+		self.energyUsageRate = [0.5] * len(self.foodType)
+		self.foodsEaten = [0] * len(self.foodType)
+		self.holding = [-1] * len(self.foodType)
 
 		#Initialize flags
-		self.moved = (False, )
+		self.moved = (False, 0) #if animat moved and direction animat moved in
 		self.alive = True
-
 
 		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
-		self.foodToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
-		self.eatingRateToEnergyWeights = [0.25, 0.25, 0.25, 0.25]
 
-		#Load the Neural Net
+		#Load the Neural Net (CURRENTLY UNUSED: we are using q learner instead)
 		nni = NNInitializer()
 		self.neuralNet = nni.readNetwork(filename)
 
@@ -58,19 +55,12 @@ class Animat:
 
 	def tick(self):
 		#qLearn.
-		self.reward = 0
 		currentState  = self.getState()
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
-		for f in self.foodType:
-			if (self.holding[f] >= 0):
-				# move the food I'm holding
-				self.env[f].returnFood(self.holding[f]).y = self.y;
-				self.env[f].returnFood(self.holding[f]).x = self.x;
-				break;
-		self.reward -= Animat.LIVING_COST
+		reward = self.getReward() #update energies and get the reward after performing action
 		nextState = self.getState() #get the new state after performing actions
-		self.qLearn.learn(currentState, action, self.reward, nextState) #update the Q Table
+		self.qLearn.learn(currentState, action, reward, nextState) #update the Q Table
 
 	#Perform action based on input action. Should return the integer value
 	#of the +/- reward experienced from performing the action
@@ -92,7 +82,7 @@ class Animat:
 			pass
 
 		if action == 'eat':
-			self.eatAnything()
+			self.eatAll()
 
 		if action == 'pickup':
 			self.pickupAnything()
@@ -162,10 +152,16 @@ class Animat:
 			self.y = newy
 			self.x = newx
 			self.moved = True
+			for f in self.foodType:
+				if (self.holding[f] >= 0):
+					# move the food I'm holding
+					self.env[f].returnFood(self.holding[f]).y = self.y;
+					self.env[f].returnFood(self.holding[f]).x = self.x;
+					break;
 			
 	def pickupAnything(self):
 		# Go through the food types
-		for foodType in range(0,1+1):
+		for foodType in enumerate(self.foodTypes):
 			if self.pickup(foodType):
 				return;
 
@@ -184,7 +180,7 @@ class Animat:
 
 	def dropAnything(self):
 		# Drop whatever we're holding
-		for foodType in range(0,1+1):
+		for foodType in enumerate(self.foodTypes):
 			if self.drop(foodType):
 				return;
 
@@ -195,34 +191,23 @@ class Animat:
 			return True;
 		return False;
 
-	def expendEnergy(self):
-		if self.moved:
-			self.energy -= Animat.MOVEMENT_COST
-			self.moved = False #reset variable for next tick
-
-		self.energy -= Animat.LIVING_COST
-
-		if self.energy <= 0:
-			self.energy = 0 #can't have negative energy
-			self.die()
-
 	def die(self):
 		Animat.count -= 1
 		self.alive = False;
 		pass #replace w/ self.env.removeAnimatFromMap()
 
 	def eatAnything(self):
-		for foodType in range(0,1+1):
+		for foodType in enumerate(self.foodTypes):
 			if self.eat(foodType):
 				return;
 
 	def eatAll(self):
 		foodsEaten = [];
-		for foodType in range(0,1+1):
+		for i,foodType in enumerate(self.foodTypes):
 			if self.eat(foodType):
-				foodsEaten.append(1);
+				self.foodsEaten[i] = 1;
 			else:
-				foodsEaten.append(0);
+				self.foodsEaten[i] = 0;
 		return foodsEaten;
 
 	def eat(self,foodType):
@@ -231,7 +216,6 @@ class Animat:
 			foodItem = self.env[foodType].returnFood(foodId)
 			if not foodItem.held:
 				self.eatFood(foodItem,foodType)
-				self.reward += Animat.EATING_REWARD
 				return True;
 		return False;
 
@@ -307,17 +291,18 @@ class Animat:
 
 	#reset flags for next iteration
 	def resetFlags(self):
-		self.moved = False
+		self.moved = (False, 'stay')
 		self.followedGradient = False
 
-	def rewardFunction(self):
+	def getReward(self):
 
 		#Animat Parameter Constants
 		LIVING_COST     = 1.0
 		MOVEMENT_COST	= 0.01	 # Cost to move one unit
-		EATING_REWARD   = 10.0 # Reward for eating one food source
+		EATING_REWARD   = 10.0   # Reward for eating one food source
+		EATING_MULT_REWARD = 10.0
 
-		extraRewards = 0 #Keep track of extra rewards that this animat achieves (kinda like achievements when playing games)
+		rewardMultiplier = 1 #Multiply positive rewards when doing things like eating multiple food sources
 		previousEnergy = copy(self.energy)
 
 		#Figure out which food source you were to follow
@@ -327,8 +312,21 @@ class Animat:
 		foodSourcesToFollow = [i for i, mymax in enumerate(maxFollowValues) if mymax ==  maxFollowValue]
 
 		#Subtract living cost and movement cost for each energy rate
-		self.energy = [ currEnergy - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy,rate in zip(self.energy, self.energyUsageRate)]
+		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
+		
+		#Determine a reward multiplier if eating multiple foods
+		numFoodEaten = self.foodsEaten.count(1)
+		if numFoodEaten > 1:
+			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
 
+		#Compute delta energy for each energy bucket
+		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnery in zip(self.energy, previousEnergy)]
+
+		netDeltaEnergy = sum(deltaEnergy)
+
+		reward = netDeltaEnergy * rewardsMultiplier
+
+		return reward
 
 
 		
