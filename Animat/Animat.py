@@ -295,7 +295,7 @@ class Animat:
 				return 'notholding';
 
 	def replenishEnergy(self):
-		self.energy = [50.0] * len(self.foodTypes)
+		self.energy = [1000.0] * len(self.foodTypes)
 
 	#reset flags for next iteration
 	def resetFlags(self):

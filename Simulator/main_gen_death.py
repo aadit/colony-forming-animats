@@ -40,7 +40,7 @@ fig = plt.figure()
 ims = []
 toPlot = zeros((mapsize,mapsize));
 
-Animat.allowDeath = True
+Animat.allowDeath = False
 # Training session
 for i in range(0,9000):
 	for e in env:
@@ -86,8 +86,10 @@ ims=[];
 
 # Two food generators
 
-env[0].addFoodGenerator(10,12,200,5000); #y, x, regeneration rate, food bitsize
-env[1].addFoodGenerator(88,90,200,5000);
+env[0].addFoodGenerator(45,12,200,5000); #y, x, regeneration rate, food bitsize
+env[1].addFoodGenerator(53,90,200,5000);
+env[2].addFoodGenerator(3,53,200,5000);
+env[3].addFoodGenerator(96,49,200,5000);
 Animat.allowDeath = True
 for a in animats:
 	a.replenishEnergy()
