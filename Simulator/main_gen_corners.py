@@ -59,14 +59,14 @@ ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 plt.colorbar()
 plt.show()
 
-fig.plt.figure();
+fig=plt.figure();
 ims=[];
 
 # Two food generators
 env[0].addFoodGenerator(35,40,20);
 env[1].addFoodGenerator(10,5,25);
 
-for i in range(0,15000):
+for i in range(0,5000):
 	for e in env:
 		e.tick()
 	for a in animats:
