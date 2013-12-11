@@ -137,10 +137,10 @@ class Env:
 		foody = random.randrange(0,self.size)
 		foodx = random.randrange(0,self.size)
 		#self.makeFood(foody,foodx,random.randrange(0,4));
-		self.makeFood(foody,foodx);
+		self.makeFood(foody,foodx,50);
 									   			
-	def makeFood(self,foody,foodx):
-		self.foodList.append( Food(self.foodCounter,foody,foodx,50,self.foodType));
+	def makeFood(self,foody,foodx,foodSize):
+		self.foodList.append( Food(self.foodCounter,foody,foodx,foodSize,self.foodType));
 		self.foodCounter += 1;
 						   			
 	def removeFood(self,id):
@@ -149,14 +149,14 @@ class Env:
 				del self.foodList[index];
 				break;
 		
-	def addFoodGenerator(self,locy,locx,frequency):
+	def addFoodGenerator(self,locy,locx,frequency, foodSize):
 		# Make sure this location resides in our map
 		if (locy < 0 or locy > self.size or locx < 0 or locx > self.size):
 			# Bad location
 			print 'Bad location for food generator! Not on map'
 		else:
 			#frequency = 25; # random for now
-			f = FoodGenerator(locy,locx,frequency)
+			f = FoodGenerator(locy,locx,frequency, foodSize, self)
 			self.foodGeneratorList.append(f)
 			
 	def returnFoodIDAt(self,foody,foodx):

@@ -56,9 +56,11 @@ class Animat:
 	def tick(self):
 		#qLearn.
 		currentState  = self.getState()
+		targetFood = self.getTargetFoodSource()
+		targetFoodDirection = self.senseEnvironment(targetFood)
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
-		reward = self.getReward() #update energies and get the reward after performing action
+		reward = self.getReward(targetFoodDirection, action) #update energies and get the reward after performing action
 		#print "Reward is:", reward
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, reward, nextState) #update the Q Table
@@ -299,18 +301,31 @@ class Animat:
 		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTilMax)] 
 		maxFollowValue = max(satiation)
 		targetFoodSources = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
+		if targetFoodSources:
+			targetFood = choice(targetFoodSources)
 
-	def getReward(self):
+		return targetFood
+
+	def getReward(self, targetDirection, action):
 
 		#Animat Parameter Constants
 		LIVING_COST     = 1.0
 		MOVEMENT_COST	= 0.01	 # Cost to move one unit
-		EATING_REWARD   = 3.0   # Reward for eating one food source
+		EATING_REWARD   = 30.0   # Reward for eating one food source
 		EATING_MULT_REWARD = 100.0
+		GRADIENT_FOLLOW_REWARD = 10.0
 
 		previousEnergy = copy.copy(self.energy)
 
 		#print "Foods eaten: ", self.foodsEaten
+
+		#Reward Gradient
+		gradientReward = 0
+
+		if targetDirection == action:
+			LIVING_COST = 0
+			MOVEMENT_COST = 0
+			#print targetDirection, action
 		
 		#Subtract living cost and movement cost for each energy rate
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
@@ -319,7 +334,7 @@ class Animat:
 		#Compute delta energy for each energy bucket
 		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnergy in zip(self.energy, previousEnergy)]
 		netDeltaEnergy = sum(deltaEnergy) #sum up all of the delta energies
-		
+
 		#Determine a reward multiplier if eating multiple foods when hungry
 		rewardsMultiplier = 1
 		numFoodEaten = self.foodsEaten.count(1)
@@ -327,7 +342,11 @@ class Animat:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
 			print "Ate multiple food sources!"
 
-		reward = netDeltaEnergy * rewardsMultiplier
+		reward = netDeltaEnergy * rewardsMultiplier + gradientReward
+
+		if targetDirection == action:
+			pass
+			#print reward
 
 		return reward
 
