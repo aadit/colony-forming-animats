@@ -31,9 +31,9 @@ class Animat:
 		self.ID = idnum
 		self.foodTypes = foodTypes
 		self.energy = [1000.0] * len(self.foodTypes)
-		self.maxEnergy = [10000.0] * len(self.foodTypes)
+		self.maxEnergy = [1500.0] * len(self.foodTypes)
 		self.previousEnergy = copy.copy(self.energy)
-		self.energyUsageRate = [0.5] * len(self.foodTypes)
+		self.energyUsageRate = [1.0/len(self.foodTypes)] * len(self.foodTypes)
 		self.foodsEaten = [0] * len(self.foodTypes)
 		self.holding = [-1] * len(self.foodTypes)
 
@@ -104,8 +104,17 @@ class Animat:
 		# then shift total << 
 
 		total = 0;
-		
-		# Food gradient choices are 4, can be represented by 2 bits
+		total *= 10;
+		total *= 10;
+		targetFood = self.getTargetFoodSource();
+		if targetFood == 0:
+			total += 0;
+		elif targetFood == 1:
+			total += 1;
+		elif targetFood == 2:
+			total += 10;
+		elif targetFood == 3:
+			total += 11;
 		for i in self.foodTypes:
 			total *= 10;
 			total += 1 if (self.holding[self.foodTypes[i]] > 0) else 0;
@@ -343,7 +352,7 @@ class Animat:
 		numFoodEaten = self.foodsEaten.count(1)
 		if numFoodEaten > 1 and netDeltaEnergy > 0:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
-			print "Ate multiple food sources!"
+			print "Ate ",numFoodEaten," food sources!"
 			self.multipleFoodEaten += 1;
 
 		reward = netDeltaEnergy * rewardsMultiplier + gradientReward

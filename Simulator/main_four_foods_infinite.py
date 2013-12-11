@@ -34,8 +34,8 @@ for a in range(0,20):
 
 fig = plt.figure()
 ims = []
-#toPlot = zeros((mapsize,mapsize));
-Animat.allowDeath = True
+toPlot = zeros((mapsize,mapsize));
+
 # Training session
 for i in range(0,7000):
 	for e in env:
@@ -95,7 +95,7 @@ for i in range(0,20000):
 			#e.simpleMap[a.y,a.x] = e.simpleMap.max() if e.simpleMap.max() > 0 else 1;
 			#e.simpleMap[a.y,a.x] = 10;
 			e.binaryGradient[a.y,a.x] = e.binaryGradient.max() if e.binaryGradient.max() > 0 else 1;
-	if i % 100 == 0:
+	if i % 10 == 0:
 		#for e in env:
 		#im = plt.imshow(env[0].map+env[1].map)
 		im = plt.imshow(env[0].binaryGradient+env[1].binaryGradient
