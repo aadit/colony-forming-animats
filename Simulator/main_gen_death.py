@@ -17,32 +17,30 @@ import matplotlib.animation as animation
 
 print 'Running Simulation - Add food generators to corners'
 
-filename = 'nn_precise_100k.p'
-#Init Environment and food sources
-foodTypes = [0,1];
+foodTypes = [0,1,2,3];
 mapsize = 100;
-env = [Env(mapsize,foodTypes[0]),Env(mapsize,foodTypes[1])];
+env = [Env(mapsize,foodTypes[0]),Env(mapsize,foodTypes[1]),
+		Env(mapsize,foodTypes[2]),Env(mapsize,foodTypes[3])];
 for e in env:
 	e.makeGradient()
 	for i in range (0,100):
 		e.makeFoodRandom()
 	e.updateMap()
 
-#Create Animat
-#animats = [Animat(25,25,env,filename), 
-#			Animat(10,40,env,filename), 
-#			Animat(45,10,env,filename), 
-#			Animat(30,40,env,filename)]
+fig = plt.figure()
+ims = []
+toPlot = zeros((mapsize,mapsize));
 
 animats = [];
 deadAnimats = [];
 for a in range(0,20):
-	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,filename));
+	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes));
 
 fig = plt.figure()
 ims = []
 toPlot = zeros((mapsize,mapsize));
 
+Animat.allowDeath = True
 # Training session
 for i in range(0,9000):
 	for e in env:

@@ -22,31 +22,31 @@ class Animat:
 	energyThreshold = 80
 	actions = ['north', 'south', 'east','west','eat','pickup','drop']
 
-	def __init__(self,starty,startx, env, filename, idnum = 1):
+	def __init__(self,starty,startx, env, foodTypes, idnum = 1):
 
 		#Initialize instance parameters
 		self.y = starty
 		self.x = startx
 		self.env = env
 		self.ID = idnum
-		self.foodTypes = [0,1,2,3]
-		self.energy = [50.0] * len(self.foodTypes)
-		self.maxEnergy = [100.0] * len(self.foodTypes)
+		self.foodTypes = foodTypes
+		self.energy = [1000.0] * len(self.foodTypes)
+		self.maxEnergy = [10000.0] * len(self.foodTypes)
 		self.previousEnergy = copy.copy(self.energy)
 		self.energyUsageRate = [0.5] * len(self.foodTypes)
 		self.foodsEaten = [0] * len(self.foodTypes)
 		self.holding = [-1] * len(self.foodTypes)
 
 		#Initialize flags
-		self.moved = (False, 0) #if animat moved and direction animat moved in
+		self.moved = False #if animat moved and direction animat moved in
 		self.alive = True
 
 		#Initialize threshold parameters
 		self.reproductionThreshold = 40.0 #need 40 energy units to reproduce
 
 		#Load the Neural Net (CURRENTLY UNUSED: we are using q learner instead)
-		nni = NNInitializer()
-		self.neuralNet = nni.readNetwork(filename)
+		#nni = NNInitializer()
+		#self.neuralNet = nni.readNetwork(filename)
 
 		#Update Class Parameters
 		Animat.count += 1
@@ -147,7 +147,7 @@ class Animat:
 		if self.env[0].canMove(self.y,self.x,newy,newx):
 			self.y = newy
 			self.x = newx
-			self.moved = (True,0)
+			self.moved = True
 			for f in self.foodTypes:
 				if (self.holding[f] >= 0):
 					# move the food I'm holding
@@ -299,7 +299,7 @@ class Animat:
 
 	#reset flags for next iteration
 	def resetFlags(self):
-		self.moved = (False, 0)
+		self.moved = False
 		self.followedGradient = False
 		self.foodsEaten = [0] * len(self.foodTypes)
 
@@ -329,13 +329,13 @@ class Animat:
 		#Reward Gradient
 		gradientReward = 0
 
-		if targetDirection == action:
+		if targetDirection == action and self.moved:
 			LIVING_COST = 0
 			MOVEMENT_COST = 0
 			#print targetDirection, action
 		
 		#Subtract living cost and movement cost for each energy rate
-		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
+		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
 		self.energy = [ min(currEnergy, maxEnergy) for currEnergy, maxEnergy in zip(self.energy,self.maxEnergy)] #Limit energy to max energy
 		
 		#Compute delta energy for each energy bucket
