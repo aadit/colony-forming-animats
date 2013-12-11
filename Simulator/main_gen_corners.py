@@ -15,12 +15,12 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-print 'Running Simulation - Find food'
+print 'Running Simulation - Add food generators to corners'
 
-#filename = 'nn_scents_based.p'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
-env = [Env(50,0),Env(50,1)];
+foodTypes = [0,1];
+env = [Env(50,foodTypes[0]),Env(50,foodTypes[1])];
 for e in env:
 	e.makeGradient()
 	for i in range (0,100):
@@ -35,7 +35,9 @@ animats = [Animat(25,25,env,filename),
 
 fig = plt.figure()
 ims = []
-for i in range(0,50000):
+
+# Training session
+for i in range(0,20000):
 	for e in env:
 		e.tick()
 	for a in animats:
@@ -48,6 +50,35 @@ for i in range(0,50000):
 		im.set_cmap('spectral')
 		ims.append([im])
 	if i % 1000 == 0:
+		print 'Tick: '+str(i);
+for e in env:
+	e.tick()
+print 'Finished training'
+ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
+	repeat=False)
+plt.colorbar()
+plt.show()
+
+fig=plt.figure();
+ims=[];
+
+# Two food generators
+env[0].addFoodGenerator(35,40,20);
+env[1].addFoodGenerator(10,5,25);
+
+for i in range(0,5000):
+	for e in env:
+		e.tick()
+	for a in animats:
+		a.tick()
+		for e in env:
+			e.map[a.y,a.x] = e.map.max();
+	if i % 10 == 0:
+		#for e in env:
+		im = plt.imshow(env[0].map+env[1].map)
+		im.set_cmap('spectral')
+		ims.append([im])
+	if i % 100 == 0:
 		print 'Tick: '+str(i);
 
 for e in env:
