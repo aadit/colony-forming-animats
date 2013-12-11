@@ -55,6 +55,7 @@ class Animat:
 
 		#Statistics
 		self.multipleFoodEaten = 0;
+		self.multipleDrop = 0;
 
 	def tick(self):
 		#qLearn.
@@ -192,7 +193,16 @@ class Animat:
 				return;
 
 	def drop(self,foodType):
+		# Check to see
 		if self.holding[foodType] != -1:
+			# Check to see if we're about to drop one food type on a different food type
+			# If so, increment self.multipleDrop
+			# def isOnFood(self,foodType):
+			for f in self.foodTypes:
+				if foodType != f and self.isOnFood(f):
+					self.multipleDrop += 1;
+					break;
+
 			self.env[foodType].returnFood(self.holding[foodType]).drop();
 			self.holding[foodType] = -1;
 			return True;
