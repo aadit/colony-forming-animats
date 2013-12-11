@@ -68,8 +68,9 @@ fig=plt.figure();
 ims=[];
 
 # Two food generators
-env[0].addFoodGenerator(35,50,1000,1000);
-env[1].addFoodGenerator(65,50,1000,1000);
+
+env[0].addFoodGenerator(35,50,200,5000); #y, x, regeneration rate, food bitsize
+env[1].addFoodGenerator(65,50,200,5000);
 
 for i in range(0,30000):
 	for e in env:
