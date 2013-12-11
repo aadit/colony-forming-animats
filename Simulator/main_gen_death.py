@@ -36,10 +36,6 @@ deadAnimats = [];
 for a in range(0,20):
 	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes));
 
-fig = plt.figure()
-ims = []
-toPlot = zeros((mapsize,mapsize));
-
 Animat.allowDeath = False
 # Training session
 for i in range(0,9000):
