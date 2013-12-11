@@ -102,11 +102,7 @@ class Animat:
 	def getState(self):
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
-		
-		
 
-		# temp states, just for example
-		# in reality, this stuff will come from the animat itself
 		total = 0;
 		
 		# Food gradient choices are 4, can be represented by 2 bits
