@@ -69,6 +69,9 @@ class Animat:
 		nextState = self.getState() #get the new state after performing actions
 		self.qLearn.learn(currentState, action, reward, nextState) #update the Q Table
 		self.resetFlags()
+		self.checkDeath()
+		return self.alive
+
 
 	#Perform action based on input action. Should return the integer value
 	#of the +/- reward experienced from performing the action
@@ -208,11 +211,14 @@ class Animat:
 			return True;
 		return False;
 
-	def die(self):
-		Animat.count -= 1
-		self.alive = False;
-		pass #replace w/ self.env.removeAnimatFromMap()
-
+	def checkDeath(self):
+		for e in self.energy:
+			if e <= 0:
+				Animat.count -= 1
+				self.alive = False;
+				print "Animat died."
+				return
+	
 	def eatAnything(self):
 		for i,foodType in enumerate(self.foodTypes):
 			if self.eat(foodType):
