@@ -29,7 +29,7 @@ class Animat:
 		self.x = startx
 		self.env = env
 		self.ID = idnum
-		self.foodTypes = [0,1]
+		self.foodTypes = [0,1,2,3]
 		self.energy = [50.0] * len(self.foodTypes)
 		self.maxEnergy = [100.0] * len(self.foodTypes)
 		self.previousEnergy = copy.copy(self.energy)
@@ -90,9 +90,6 @@ class Animat:
 		if action == 'west':
 			self.move(self.y,self.x - 1)
 
-		if action == 'stay':
-			pass
-
 		if action == 'eat':
 			self.eatAll()
 
@@ -106,46 +103,29 @@ class Animat:
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
 		
-		foodgradient1 = self.senseEnvironment(0)  
-		foodgradient2 = self.senseEnvironment(1) 
+		
 
 		# temp states, just for example
 		# in reality, this stuff will come from the animat itself
 		total = 0;
-		#total += 1 if (self.energy1 < Animat.energyThreshold) else 0;
-		#total *= 10;
-		#total += 1 if (self.energy2 < Animat.energyThreshold) else 0;
-		#total *= 10;
-		total += 1 if (self.holding[self.foodTypes[0]] > 0) else 0;
-		total *= 10;
-		total += 1 if (self.holding[self.foodTypes[1]] > 0) else 0;
-		total *= 10;
-		total += 1 if (self.isOnFood(0)) else 0;
-		total *= 10;
-		total += 1 if (self.isOnFood(1)) else 0;
 		
 		# Food gradient choices are 4, can be represented by 2 bits
-		total *= 10;
-		total *= 10;
-		if (foodgradient1 == 'north'):
-			total += 0;
-		elif (foodgradient1 == 'south'):
-			total += 1;
-		elif (foodgradient1 == 'west'):
-			total += 10;
-		elif (foodgradient1 == 'east'):
-			total += 11;
-			
-		total *= 10;
-		total *= 10;
-		if (foodgradient2 == 'north'):
-			total += 0;
-		elif (foodgradient2 == 'south'):
-			total += 1;
-		elif (foodgradient2 == 'west'):
-			total += 10;
-		elif (foodgradient2 == 'east'):
-			total += 11;
+		for i in self.foodTypes:
+			total *= 10;
+			total += 1 if (self.holding[self.foodTypes[i]] > 0) else 0;
+			total *= 10;
+			total += 1 if (self.isOnFood(i)) else 0;
+			foodgradient = self.senseEnvironment(i)
+			total *= 10;
+			total *= 10;
+			if (foodgradient == 'north'):
+				total += 0;
+			elif (foodgradient == 'south'):
+				total += 1;
+			elif (foodgradient == 'west'):
+				total += 10;
+			elif (foodgradient == 'east'):
+				total += 11;
 			
 		return int(str(total),2);
 

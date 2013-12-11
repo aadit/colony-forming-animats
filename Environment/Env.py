@@ -10,6 +10,7 @@ class Env:
 	def __init__(self,sizeOfSquare,foodType):
 		self.map = zeros((sizeOfSquare,sizeOfSquare));
 		self.simpleMap = zeros((sizeOfSquare,sizeOfSquare));
+		self.binaryGradient = zeros((sizeOfSquare,sizeOfSquare));
 		self.size = sizeOfSquare;
 		self.foodGeneratorList = [];
 		self.foodList = [];
@@ -73,8 +74,23 @@ class Env:
 		#print 'gradStartX: '+str(gradStartX)
 		#print 'self.size: '+str(self.size)
 		
-		self.map = 	self.map + (self.gradient[gradStartY:gradStartY + self.size ,
+		self.map = self.map + (self.gradient[gradStartY:gradStartY + self.size ,
 							   			gradStartX:gradStartX + self.size ])
+
+	def addBinaryGradient(self,foody,foodx):
+		gradCenterY = self.size - 1 # zero indexing
+		gradCenterX = self.size - 1
+		gradStartY = gradCenterY - foody
+		gradStartX = gradCenterX - foodx
+		#print 'gradCenterY: '+str(gradCenterY)
+		#print 'gradCenterX: '+str(gradCenterX)
+		#print 'gradStartY: '+str(gradStartY)
+		#print 'gradStartX: '+str(gradStartX)
+		#print 'self.size: '+str(self.size)
+		
+		self.binaryGradient = (self.binaryGradient + 
+									(self.gradient[gradStartY:gradStartY + self.size ,
+							   			gradStartX:gradStartX + self.size ]))
 		
 	def updateMap(self):
 		# This allows us to update the map whenever necessary
@@ -82,9 +98,18 @@ class Env:
 		# Add to map accordingly
 		self.map = zeros((self.size,self.size));
 		self.simpleMap = zeros((self.size,self.size));
+		#self.binaryMap = zeros((self.size,self.size));
+		uniqueFoodLocations = [];
+		self.binaryGradient = zeros((self.size,self.size));
 		for food in self.foodList:
 			self.addGradient(food.y,food.x);
 			self.simpleMap[food.y,food.x] = 3 if self.foodType == 0 else 7;
+			#self.binaryMap[food.y,food.x] = 1;
+			uniqueFoodLocations.append((food.y,food.x));
+		for l in set(uniqueFoodLocations):
+			self.addBinaryGradient(l[0],l[1]); 
+			pass;
+
 	
 	def displaySize(self):
 		print 'Size is ' + str(self.size)
