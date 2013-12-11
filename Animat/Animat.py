@@ -309,7 +309,6 @@ class Animat:
 		EATING_REWARD   = 3.0   # Reward for eating one food source
 		EATING_MULT_REWARD = 100.0
 
-		rewardsMultiplier = 1 #Multiply positive rewards when doing things like eating multiple food sources
 		previousEnergy = copy.copy(self.energy)
 
 		#print "Foods eaten: ", self.foodsEaten
@@ -318,16 +317,16 @@ class Animat:
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
 		self.energy = [ min(currEnergy, maxEnergy) for currEnergy, maxEnergy in zip(self.energy,self.maxEnergy)] #Limit energy to max energy
 		
-		#Determine a reward multiplier if eating multiple foods
-		numFoodEaten = self.foodsEaten.count(1)
-		if numFoodEaten > 1:
-			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
-			print "Ate multiple food sources!"
-
 		#Compute delta energy for each energy bucket
 		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnergy in zip(self.energy, previousEnergy)]
-
-		netDeltaEnergy = sum(deltaEnergy)
+		netDeltaEnergy = sum(deltaEnergy) #sum up all of the delta energies
+		
+		#Determine a reward multiplier if eating multiple foods when hungry
+		rewardsMultiplier = 1
+		numFoodEaten = self.foodsEaten.count(1)
+		if numFoodEaten > 1 and netDeltaEnergy > 0:
+			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
+			print "Ate multiple food sources!"
 
 		reward = netDeltaEnergy * rewardsMultiplier
 
