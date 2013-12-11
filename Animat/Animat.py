@@ -322,8 +322,11 @@ class Animat:
 
 		#Reward Gradient
 		gradientReward = 0
+
 		if targetDirection == action:
-			gradientReward+= GRADIENT_FOLLOW_REWARD
+			LIVING_COST = 0
+			MOVEMENT_COST = 0
+			#print targetDirection, action
 		
 		#Subtract living cost and movement cost for each energy rate
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved[0]) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
@@ -341,6 +344,10 @@ class Animat:
 			print "Ate multiple food sources!"
 
 		reward = netDeltaEnergy * rewardsMultiplier + gradientReward
+
+		if targetDirection == action:
+			pass
+			#print reward
 
 		return reward
 

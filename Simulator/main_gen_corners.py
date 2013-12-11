@@ -20,7 +20,7 @@ print 'Running Simulation - Add food generators to corners'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
 foodTypes = [0,1];
-env = [Env(50,foodTypes[0]),Env(50,foodTypes[1])];
+env = [Env(100,foodTypes[0]),Env(100,foodTypes[1])];
 for e in env:
 	e.makeGradient()
 	for i in range (0,100):
@@ -37,7 +37,7 @@ fig = plt.figure()
 ims = []
 
 # Training session
-for i in range(0,20000):
+for i in range(0,7000):
 	for e in env:
 		e.tick()
 	for a in animats:
@@ -63,10 +63,10 @@ fig=plt.figure();
 ims=[];
 
 # Two food generators
-env[0].addFoodGenerator(35,40,20);
-env[1].addFoodGenerator(10,5,25);
+env[0].addFoodGenerator(35,50,1000,1000);
+env[1].addFoodGenerator(65,50,1000,1000);
 
-for i in range(0,5000):
+for i in range(0,30000):
 	for e in env:
 		e.tick()
 	for a in animats:
