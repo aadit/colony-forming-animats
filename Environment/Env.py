@@ -9,6 +9,7 @@ class Env:
 	
 	def __init__(self,sizeOfSquare,foodType):
 		self.map = zeros((sizeOfSquare,sizeOfSquare));
+		self.simpleMap = zeros((sizeOfSquare,sizeOfSquare));
 		self.size = sizeOfSquare;
 		self.foodGeneratorList = [];
 		self.foodList = [];
@@ -80,8 +81,10 @@ class Env:
 		# Iterate through foodList
 		# Add to map accordingly
 		self.map = zeros((self.size,self.size));
+		self.simpleMap = zeros((self.size,self.size));
 		for food in self.foodList:
 			self.addGradient(food.y,food.x);
+			self.simpleMap[food.y,food.x] = 3 if self.foodType == 0 else 7;
 	
 	def displaySize(self):
 		print 'Size is ' + str(self.size)
