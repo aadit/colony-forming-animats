@@ -18,8 +18,8 @@ print 'Running Simulation - Moving food around, picking up, dropping'
 filename = 'nn_precise_100k.p'
 
 size = 50;
-env1 = Env(size)
-env2 = Env(size);
+env1 = Env(size,0)
+env2 = Env(size,1);
 for i in range (0,20):
 	env1.makeFoodRandom();
 	env2.makeFoodRandom();

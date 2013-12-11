@@ -204,13 +204,12 @@ class Animat:
 				return;
 
 	def eatAll(self):
-		foodsEaten = [];
 		for i,foodType in enumerate(self.foodTypes):
 			if self.eat(foodType):
 				self.foodsEaten[i] = 1;
 			else:
 				self.foodsEaten[i] = 0;
-		return foodsEaten;
+		return self.foodsEaten;
 
 	def eat(self,foodType):
 		foodId = self.env[foodType].returnFoodIDAt(self.y, self.x)
