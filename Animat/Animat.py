@@ -295,6 +295,12 @@ class Animat:
 		self.followedGradient = False
 		self.foodsEaten = [0] * len(self.foodTypes)
 
+	def getTargetFoodSource(self):
+		energyTilMax  = [y - x for x,y in zip(self.energy, self.maxEnergy)] # maxEnergy - currEnergy for each food source
+		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTilMax)] 
+		maxFollowValue = max(satiation)
+		targetFoodSources = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
+
 	def getReward(self):
 
 		#Animat Parameter Constants
@@ -305,12 +311,6 @@ class Animat:
 
 		rewardsMultiplier = 1 #Multiply positive rewards when doing things like eating multiple food sources
 		previousEnergy = copy.copy(self.energy)
-
-		#Figure out which food source you were to follow
-		energyTillMax = [y - x for x,y in zip(self.energy, self.maxEnergy)]
-		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTillMax)]
-		maxFollowValue = max(satiation)
-		foodSourcesToFollow = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
 
 		#print "Foods eaten: ", self.foodsEaten
 		
