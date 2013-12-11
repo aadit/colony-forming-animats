@@ -44,7 +44,7 @@ ims = []
 toPlot = zeros((mapsize,mapsize));
 
 # Training session
-for i in range(0,3000):
+for i in range(0,9000):
 	for e in env:
 		e.tick()
 	for a in animats:
@@ -52,6 +52,9 @@ for i in range(0,3000):
 		if not isAlive:
 			animats.remove(a)
 			deadAnimats.append(a)
+	if len(animats) <= 0:
+		print "All animats dead"
+		break
 		#for e in env:
 			#e.map[a.y,a.x] = e.map.max() if e.map.max() > 0 else 1;
 			#e.simpleMap[a.y,a.x] = e.simpleMap.max() if e.simpleMap.max() > 0 else 1;
@@ -74,6 +77,7 @@ for i in range(0,3000):
 for e in env:
 	e.tick()
 print 'Finished training'
+print "There are", len(animats), "animats left"
 ani = animation.ArtistAnimation(fig, ims, interval=50, #blit=True,
 	repeat=False)
 plt.colorbar()
@@ -86,12 +90,22 @@ ims=[];
 
 env[0].addFoodGenerator(10,12,200,5000); #y, x, regeneration rate, food bitsize
 env[1].addFoodGenerator(88,90,200,5000);
-
-for i in range(0,2000):
+Animat.allowDeath = True
+for a in animats:
+	a.replenishEnergy()
+	
+for i in range(0,15000):
 	for e in env:
 		e.tick()
 	for a in animats:
 		a.tick()
+		isAlive = a.tick()
+		if not isAlive:
+			animats.remove(a)
+			deadAnimats.append(a)
+	if len(animats) <= 0:
+		print "All animats dead"
+		break
 		#for e in env:
 			#e.map[a.y,a.x] = e.map.max() if e.map.max() > 0 else 1;
 			#e.simpleMap[a.y,a.x] = e.simpleMap.max() if e.simpleMap.max() > 0 else 1;
@@ -136,4 +150,4 @@ def printStats():
 #ani.save('search_and_destroy.mp4')
 
 
-print 'Finished!'
+print 'Finished!' 

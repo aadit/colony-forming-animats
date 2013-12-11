@@ -18,8 +18,9 @@ class Animat:
 	energyPerTick = [[]]
 	count = 0
 	ID = -1;
+	allowDeath = False
 	energyThreshold = 80
-	actions = ['north', 'south', 'east','west','stay','eat','pickup','drop']
+	actions = ['north', 'south', 'east','west','eat','pickup','drop']
 
 	def __init__(self,starty,startx, env, filename, idnum = 1):
 
@@ -29,8 +30,8 @@ class Animat:
 		self.env = env
 		self.ID = idnum
 		self.foodTypes = [0,1]
-		self.energy = [50] * len(self.foodTypes)
-		self.maxEnergy = [100] * len(self.foodTypes)
+		self.energy = [50.0] * len(self.foodTypes)
+		self.maxEnergy = [100.0] * len(self.foodTypes)
 		self.previousEnergy = copy.copy(self.energy)
 		self.energyUsageRate = [0.5] * len(self.foodTypes)
 		self.foodsEaten = [0] * len(self.foodTypes)
@@ -154,7 +155,11 @@ class Animat:
 		#self.y = random.randint(1,sizey-1) - 1
 		#self.x = random.randint(1,sizex-1) - 1
 		return cls(random.randint(1,sizey-1) - 1,random.randint(1,sizex-1) - 1)
-		
+	
+	@classmethod
+	def setDeath(death):
+		Animat.allowDeath = death
+
 	def displayLocation(self):
 		print "y is " + str(self.y) + ", x is " + str(self.x)
 		
@@ -212,12 +217,13 @@ class Animat:
 		return False;
 
 	def checkDeath(self):
-		for e in self.energy:
-			if e <= 0:
-				Animat.count -= 1
-				self.alive = False;
-				print "Animat died."
-				return
+		if Animat.allowDeath:
+			for e in self.energy:
+				if e <= 0:
+					Animat.count -= 1
+					self.alive = False;
+					print "Animat died."
+					return
 	
 	def eatAnything(self):
 		for i,foodType in enumerate(self.foodTypes):
@@ -308,6 +314,8 @@ class Animat:
 			else:
 				return 'notholding';
 
+	def replenishEnergy(self):
+		self.energy = [50.0] * len(self.foodTypes)
 
 	#reset flags for next iteration
 	def resetFlags(self):
@@ -330,7 +338,7 @@ class Animat:
 		#Animat Parameter Constants
 		LIVING_COST     = 1.0
 		MOVEMENT_COST	= 0.01	 # Cost to move one unit
-		EATING_REWARD   = 30.0   # Reward for eating one food source
+		EATING_REWARD   = 10.0   # Reward for eating one food source
 		EATING_MULT_REWARD = 100.0
 		GRADIENT_FOLLOW_REWARD = 10.0
 

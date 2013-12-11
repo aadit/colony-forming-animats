@@ -43,7 +43,7 @@ ims = []
 toPlot = zeros((mapsize,mapsize));
 
 # Training session
-for i in range(0,3000):
+for i in range(0,7000):
 	for e in env:
 		e.tick()
 	for a in animats:
