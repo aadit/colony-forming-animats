@@ -5,10 +5,10 @@ import matplotlib
 matplotlib.use('TKAgg')
 import sys
 sys.path.append("..")
+import time
 
 from Environment.Env import Env
 from Animat.Animat import Animat
-from Animat.NNInitializer import NNInitializer
 import time
 from numpy import zeros
 import random
@@ -17,7 +17,6 @@ import matplotlib.animation as animation
 
 print 'Running Simulation - Add food generators to corners'
 
-filename = 'nn_precise_100k.p'
 #Init Environment and food sources
 foodTypes = [0,1,2,3];
 mapsize = 100;
@@ -28,16 +27,10 @@ for e in env:
 	for i in range (0,100):
 		e.makeFoodRandom()
 	e.updateMap()
-
-#Create Animat
-#animats = [Animat(25,25,env,filename), 
-#			Animat(10,40,env,filename), 
-#			Animat(45,10,env,filename), 
-#			Animat(30,40,env,filename)]
-
+	
 animats = [];
 for a in range(0,20):
-	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,filename));
+	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes));
 
 fig = plt.figure()
 ims = []
@@ -78,6 +71,8 @@ print 'Finished training'
 ani = animation.ArtistAnimation(fig, ims, interval=50, #blit=True,
 	repeat=False)
 plt.colorbar()
+time.sleep(3)
+
 plt.show()
 
 fig=plt.figure();
@@ -121,9 +116,11 @@ for e in env:
 	
 print 'Finished ticking'
 
+
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 	repeat=False)
 plt.colorbar()
+time.sleep(3)
 plt.show()
 
 fig=plt.figure();
