@@ -53,6 +53,9 @@ class Animat:
 		#Initialize Q-Table (States and Actions)
 		self.qLearn = QLearn(Animat.actions)
 
+		#Statistics
+		self.multipleFoodEaten = 0;
+
 	def tick(self):
 		#qLearn.
 		currentState  = self.getState()
@@ -341,6 +344,7 @@ class Animat:
 		if numFoodEaten > 1 and netDeltaEnergy > 0:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
 			print "Ate multiple food sources!"
+			self.multipleFoodEaten += 1;
 
 		reward = netDeltaEnergy * rewardsMultiplier + gradientReward
 

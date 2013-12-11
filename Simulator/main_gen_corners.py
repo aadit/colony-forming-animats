@@ -20,7 +20,8 @@ print 'Running Simulation - Add food generators to corners'
 filename = 'nn_precise_100k.p'
 #Init Environment and food sources
 foodTypes = [0,1];
-env = [Env(100,foodTypes[0]),Env(100,foodTypes[1])];
+mapsize = 100;
+env = [Env(mapsize,foodTypes[0]),Env(mapsize,foodTypes[1])];
 for e in env:
 	e.makeGradient()
 	for i in range (0,100):
@@ -28,10 +29,14 @@ for e in env:
 	e.updateMap()
 
 #Create Animat
-animats = [Animat(25,25,env,filename), 
-			Animat(10,40,env,filename), 
-			Animat(45,10,env,filename), 
-			Animat(30,40,env,filename)]
+#animats = [Animat(25,25,env,filename), 
+#			Animat(10,40,env,filename), 
+#			Animat(45,10,env,filename), 
+#			Animat(30,40,env,filename)]
+
+animats = [];
+for a in range(0,20):
+	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,filename));
 
 fig = plt.figure()
 ims = []
@@ -90,6 +95,11 @@ ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 	repeat=False)
 plt.colorbar()
 plt.show()
+
+fig=plt.figure();
+ims=[];
+
+
 
 #print 'Saving animation...'
 #ani.save('search_and_destroy.mp4')
