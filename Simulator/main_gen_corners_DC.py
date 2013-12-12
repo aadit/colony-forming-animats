@@ -15,6 +15,7 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from pylab import figure
+from DataAnalysis.DataAnalysis import Plotter
 
 print 'Running Simulation - Add food generators to corners'
 
@@ -40,8 +41,9 @@ for a in range(0,20):
 #ims = []
 #toPlot = zeros((mapsize,mapsize));
 Animat.allowDeath = False
+trainingTicks = 7000
 # Training session
-for i in range(0,15000):
+for i in range(0,trainingTicks):
 	for e in env:
 		e.tick()
 	Animat.startTick()
@@ -49,7 +51,6 @@ for i in range(0,15000):
 		stillAlive = a.tick()
 		if not stillAlive:
 			print a.energy
-
 		for e in env:
 			#e.map[a.y,a.x] = e.map.max() if e.map.max() > 0 else 1;
 			e.binaryGradient[a.y,a.x] = e.binaryGradient.max() if e.binaryGradient.max() > 0 else 1;
@@ -79,9 +80,6 @@ for e in env:
 	e.tick()
 
 
-print 'Finished training'
-Animat.allowDeath = False
-
 for i,a in enumerate(animats):
 	print i,a.energy
 	a.replenishEnergy(1000)
@@ -104,8 +102,9 @@ env[3].addFoodGenerator(96,49,200,5000);
 
 Animat.allowDeath = False
 Animat.resetStats()
+testingTicks = 20000
 
-for i in range(0,20000):
+for i in range(0,testingTicks):
 	for e in env:
 		e.tick()
 	Animat.startTick()
@@ -142,28 +141,8 @@ ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,repeat=False)
 plt.colorbar()
 plt.show()
 
-fig=plt.figure();
-ims=[];
 
-#f = open('../DataAnalysis/' + testname + '.txt')
-#f.write(Animat.energyPerTick)
-#f.close()
-#print 'Saved file'
+plotter = Plotter(Animat, testingTicks)
+plotter.plotData()
 
-#plt.scatter(x,Animat.energyPerTick)
-#plt.show()
-
-
-def printStats():
-	for i,a in enumerate(animats):
-		print i,a.energy
-	for i,a in enumerate(animats):
-		print i,a.multipleFoodEaten
-	for i,a in enumerate(animats):
-		print i,a.multipleDrop
-
-#print 'Saving animation...'
-#ani.save('search_and_destroy.mp4')
-
-
-print 'Finished!'
+print 'Finished training'

@@ -16,10 +16,15 @@ class Animat:
 
 	#Class Parameters
 	energyPerTick = []
+	singleFoodEaten=[]
+	multipleFoodEaten=[]
 	energyPerTickIndex = 0
+	singleFoodEatenIndex = 0
+	multipleFoodEatenIndex = 0
 	count = 0
 	ID = -1;
 	allowDeath = False
+	foodTargeting = True
 	energyThreshold = 80
 	actions = ['north', 'south', 'east','west','eat','pickup','drop']
 
@@ -106,17 +111,19 @@ class Animat:
 		# then shift total << 
 
 		total = 0;
-		total *= 10;
-		total *= 10;
-		targetFood = self.getTargetFoodSource();
-		if targetFood == 0:
-			total += 0;
-		elif targetFood == 1:
-			total += 1;
-		elif targetFood == 2:
-			total += 10;
-		elif targetFood == 3:
-			total += 11;
+
+		if Animat.foodTargeting:
+			total *= 10;
+			total *= 10;
+			targetFood = self.getTargetFoodSource();
+			if targetFood == 0:
+				total += 0;
+			elif targetFood == 1:
+				total += 1;
+			elif targetFood == 2:
+				total += 10;
+			elif targetFood == 3:
+				total += 11;
 		for i in self.foodTypes:
 			total *= 10;
 			total += 1 if (self.holding[self.foodTypes[i]] > 0) else 0;
@@ -146,6 +153,34 @@ class Animat:
 	@classmethod
 	def setDeath(death):
 		Animat.allowDeath = death
+
+	@classmethod
+	def resetStats(Death):
+		Animat.energyPerTick = []
+		Animat.singleFoodEaten = []
+		Animat.multipleFoodEaten = []
+		Animat.energyPerTickIndex = 0
+		Animat.singleFoodEatenIndex = 0
+		Animat.multipleFoodEatenIndex = 0
+
+	@classmethod
+	def startTick(self):
+		Animat.energyPerTick.append(0)
+		Animat.singleFoodEaten.append(0)
+		Animat.multipleFoodEaten.append(0)
+
+		if(Animat.singleFoodEatenIndex > 0):
+			Animat.singleFoodEaten[Animat.singleFoodEatenIndex] += Animat.singleFoodEaten[Animat.singleFoodEatenIndex - 1]
+
+		if(Animat.multipleFoodEatenIndex > 0):
+			Animat.multipleFoodEaten[Animat.multipleFoodEatenIndex] += Animat.multipleFoodEaten[Animat.multipleFoodEatenIndex - 1]
+
+
+	@classmethod
+	def endTick(self):
+		Animat.energyPerTickIndex += 1
+		Animat.singleFoodEatenIndex += 1
+		Animat.multipleFoodEatenIndex += 1
 
 	def displayLocation(self):
 		print "y is " + str(self.y) + ", x is " + str(self.x)
@@ -360,6 +395,10 @@ class Animat:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
 			print "Ate ",numFoodEaten," food sources!"
 			self.multipleFoodEaten += 1;
+			Animat.multipleFoodEaten[Animat.multipleFoodEatenIndex] += 1
+
+		if numFoodEaten > 0:
+			Animat.singleFoodEaten[Animat.singleFoodEatenIndex] += 1
 
 		reward = netDeltaEnergy * rewardsMultiplier + gradientReward
 
