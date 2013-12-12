@@ -110,9 +110,10 @@ class Animat:
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
 
-		total = 100;
+		total = 1;
 
 		if Animat.foodTargeting:
+			total *= 100
 			targetFood = self.getTargetFoodSource();
 			if targetFood == 0:
 				total += 0;
@@ -348,7 +349,7 @@ class Animat:
 	def getTargetFoodSource(self):
 		energyTilMax  = [y - x for x,y in zip(self.energy, self.maxEnergy)] # maxEnergy - currEnergy for each food source
 		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTilMax)]
-		satiation     = [y if x >= 0 else -1 for x,y in zip(self.holding,satiation)]
+		satiation     = [y if x < 0 else -1 for x,y in zip(self.holding,satiation)]
 		maxFollowValue = max(satiation)
 		targetFoodSources = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
 		if targetFoodSources:
@@ -373,7 +374,7 @@ class Animat:
 		#Reward Gradient
 		gradientReward = 0
 
-		if targetDirection == action and self.moved:
+		if targetDirection == action:
 			LIVING_COST = 0
 			MOVEMENT_COST = 0
 			#gradientReward = LIVING_COST + MOVEMENT_COST #offset cost if following the target gradient

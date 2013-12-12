@@ -41,7 +41,7 @@ ims = []
 toPlot = zeros((mapsize,mapsize));
 
 # Training session
-for i in range(0,7000):
+for i in range(0,15000):
 	for e in env:
 		e.tick()
 	Animat.startTick()
@@ -104,6 +104,8 @@ for e in env:
 	
 print 'Finished ticking'
 
+plotter = Plotter(Animat, ticks)
+plotter.plotData()
 
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 	repeat=False)
@@ -114,8 +116,7 @@ plt.show()
 fig=plt.figure();
 ims=[];
 
-plotter = Plotter(Animat, ticks)
-plotter.plotData()
+
 
 def printStats():
 	for i,a in enumerate(animats):
