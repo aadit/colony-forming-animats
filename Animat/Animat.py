@@ -347,7 +347,8 @@ class Animat:
 
 	def getTargetFoodSource(self):
 		energyTilMax  = [y - x for x,y in zip(self.energy, self.maxEnergy)] # maxEnergy - currEnergy for each food source
-		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTilMax)] 
+		satiation     = [y * x for x,y in zip(self.energyUsageRate, energyTilMax)]
+		satiation     = [y if x >= 0 else -1 for x,y in zip(self.holding,satiation)]
 		maxFollowValue = max(satiation)
 		targetFoodSources = [i for i, mymax in enumerate(satiation) if mymax ==  maxFollowValue]
 		if targetFoodSources:
