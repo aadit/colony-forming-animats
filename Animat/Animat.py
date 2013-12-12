@@ -113,8 +113,6 @@ class Animat:
 		total = 0;
 
 		if Animat.foodTargeting:
-			total *= 10;
-			total *= 10;
 			targetFood = self.getTargetFoodSource();
 			if targetFood == 0:
 				total += 0;
@@ -140,6 +138,7 @@ class Animat:
 				total += 10;
 			elif (foodgradient == 'east'):
 				total += 11;
+
 			
 		return int(str(total),2);
 
