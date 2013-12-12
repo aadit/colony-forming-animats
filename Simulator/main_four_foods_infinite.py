@@ -15,7 +15,7 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-print 'Running Simulation - Add food generators to corners'
+print 'Running Simulation - Four foods, one of each'
 
 #Init Environment and food sources
 foodTypes = [0,1,2,3];
@@ -29,8 +29,10 @@ for e in env:
 	e.updateMap()
 	
 animats = [];
-for a in range(0,20):
+numAnimats = 20;
+for a in range(0,numAnimats):
 	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes));
+Animat.allowDeath = True;
 
 fig = plt.figure()
 ims = []
@@ -43,32 +45,18 @@ for i in range(0,7000):
 	for a in animats:
 		a.tick()
 		for e in env:
-			#e.map[a.y,a.x] = e.map.max() if e.map.max() > 0 else 1;
-			e.binaryGradient[a.y,a.x] = e.binaryGradient.max() if e.binaryGradient.max() > 0 else 1;
-			#e.simpleMap[a.y,a.x] = e.simpleMap.max() if e.simpleMap.max() > 0 else 1;
-			#e.simpleMap[a.y,a.x] = 10;
-			#toPlot[a.y,a.x] = 5;
-			#print "e.simpleMap.max() is :"+str(e.simpleMap.max());
+			e.binaryGradient[a.y,a.x] = e.binaryGradient.max() if e.binaryGradient.max() > 0 else 1;			
 	if i % 100 == 0:
-		#for e in env:
-		#im = plt.imshow(env[0].map+env[1].map)
 		im = plt.imshow(env[0].binaryGradient+env[1].binaryGradient
 				+env[2].binaryGradient+env[3].binaryGradient)
-
-		#toPlot = env[0].simpleMap+env[1].simpleMap;
-		#for a in animats:
-		#	if toPlot[a.y,a.x] == 0:
-		#		toPlot[a.y,a.x] = 5;
-		#im = plt.imshow(toPlot)
 		im.set_cmap('spectral')
 		ims.append([im])
 	if i % 1000 == 0:
 		print 'Tick: '+str(i);
-		#print 'max is: '+str(env[0].simpleMap.max())
 for e in env:
 	e.tick()
 print 'Finished training'
-ani = animation.ArtistAnimation(fig, ims, interval=50, #blit=True,
+ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,
 	repeat=False)
 plt.colorbar()
 time.sleep(3)
@@ -78,34 +66,27 @@ plt.show()
 fig=plt.figure();
 ims=[];
 
-# Two food generators
+# Four infinite food generators
+ticks = 30000;
+# clear previous food
+for e in env:
+	e.foodList = [];
 
-env[0].addFoodGenerator(45,12,200,5000); #y, x, regeneration rate, food bitsize
-env[1].addFoodGenerator(53,90,200,5000);
-env[2].addFoodGenerator(3,53,200,5000);
-env[3].addFoodGenerator(96,49,200,5000);
+env[0].makeFood(45,12,ticks*numAnimats); #y, x, food bitsize
+env[1].makeFood(53,90,ticks*numAnimats);
+env[2].makeFood(3,53,ticks*numAnimats);
+env[3].makeFood(96,49,ticks*numAnimats);
 
-for i in range(0,20000):
+for i in range(0,ticks):
 	for e in env:
 		e.tick()
 	for a in animats:
 		a.tick()
 		for e in env:
-			#e.map[a.y,a.x] = e.map.max() if e.map.max() > 0 else 1;
-			#e.simpleMap[a.y,a.x] = e.simpleMap.max() if e.simpleMap.max() > 0 else 1;
-			#e.simpleMap[a.y,a.x] = 10;
 			e.binaryGradient[a.y,a.x] = e.binaryGradient.max() if e.binaryGradient.max() > 0 else 1;
 	if i % 10 == 0:
-		#for e in env:
-		#im = plt.imshow(env[0].map+env[1].map)
 		im = plt.imshow(env[0].binaryGradient+env[1].binaryGradient
 				+env[2].binaryGradient+env[3].binaryGradient)
-		#im = plt.imshow((env[0].simpleMap+env[1].simpleMap)/2)
-		#toPlot = env[0].simpleMap+env[1].simpleMap;
-		#for a in animats:
-		#	if toPlot[a.y,a.x] == 0:
-		#		toPlot[a.y,a.x] = 5;
-		#im = plt.imshow(toPlot)
 		im.set_cmap('spectral')
 		ims.append([im])
 	if i % 100 == 0:
@@ -134,9 +115,5 @@ def printStats():
 		print i,a.multipleFoodEaten
 	for i,a in enumerate(animats):
 		print i,a.multipleDrop
-
-#print 'Saving animation...'
-#ani.save('search_and_destroy.mp4')
-
 
 print 'Finished!'
