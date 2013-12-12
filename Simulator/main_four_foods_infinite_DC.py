@@ -113,9 +113,6 @@ plt.colorbar()
 time.sleep(3)
 plt.show()
 
-fig=plt.figure();
-ims=[];
-
 
 
 def printStats():
