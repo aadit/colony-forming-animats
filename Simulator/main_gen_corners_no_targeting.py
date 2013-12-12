@@ -63,16 +63,16 @@ for i in range(0,trainingTicks):
 	if i % 100 == 0:
 		#for e in env:
 		#im = plt.imshow(env[0].map+env[1].map)
-		im = plt.imshow(env[0].binaryGradient+env[1].binaryGradient
-				+env[2].binaryGradient+env[3].binaryGradient)
-
+		#im = plt.imshow(env[0].binaryGradient+env[1].binaryGradient
+			#	+env[2].binaryGradient+env[3].binaryGradient)
+		pass
 		#toPlot = env[0].simpleMap+env[1].simpleMap;
 		#for a in animats:
 		#	if toPlot[a.y,a.x] == 0:
 		#		toPlot[a.y,a.x] = 5;
 		#im = plt.imshow(toPlot)
-		im.set_cmap('spectral')
-		ims.append([im])
+		#im.set_cmap('spectral')
+		#ims.append([im])
 	if i % 1000 == 0:
 		print 'Tick: '+str(i);
 		#print 'max is: '+str(env[0].simpleMap.max())
@@ -84,9 +84,9 @@ for i,a in enumerate(animats):
 	print i,a.energy
 	a.replenishEnergy(1000)
 
-ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,repeat=False)
-plt.colorbar()
-plt.show()
+#ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True,repeat=False)
+#plt.colorbar()
+#plt.show()
 
 fig=plt.figure();
 ims=[];

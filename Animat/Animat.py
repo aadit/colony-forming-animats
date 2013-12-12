@@ -110,7 +110,7 @@ class Animat:
 		# Pick 1 or 0 for each state, add to total,
 		# then shift total << 
 
-		total = 0;
+		total = 100;
 
 		if Animat.foodTargeting:
 			targetFood = self.getTargetFoodSource();
@@ -361,6 +361,7 @@ class Animat:
 		LIVING_COST     = 1.0
 		MOVEMENT_COST	= 0.01	 # Cost to move one unit
 		EATING_REWARD   = 10.0   # Reward for eating one food source
+		EATING_MULT_ENERGY = 50.0
 		EATING_MULT_REWARD = 100.0
 		GRADIENT_FOLLOW_REWARD = 10.0
 
@@ -381,15 +382,20 @@ class Animat:
 		#Subtract living cost and movement cost for each energy rate
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
 		self.energy = [ min(currEnergy, maxEnergy) for currEnergy, maxEnergy in zip(self.energy,self.maxEnergy)] #Limit energy to max energy
-		
-		
+
+		numFoodEaten = self.foodsEaten.count(1)
+
+		if numFoodEaten > 1:
+			for i, v in enumerate(self.foodsEaten):
+				if v > 0:
+					self.energy[i] += EATING_MULT_ENERGY #Add extra energy to food buckets when they eat multiple foods
+
 		#Compute delta energy for each energy bucket
 		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnergy in zip(self.energy, previousEnergy)]
 		netDeltaEnergy = sum(deltaEnergy) #sum up all of the delta energies
 
 		#Determine a reward multiplier if eating multiple foods when hungry
 		rewardsMultiplier = 1
-		numFoodEaten = self.foodsEaten.count(1)
 		if numFoodEaten > 1 and netDeltaEnergy > 0:
 			rewardsMultiplier += pow(EATING_MULT_REWARD, numFoodEaten - 1)
 			print "Ate ",numFoodEaten," food sources!"
