@@ -15,14 +15,15 @@ import copy
 class Animat:
 
 	#Class Parameters
-	energyPerTick = [[]]
+	energyPerTick = []
+	energyPerTickIndex = 0
 	count = 0
 	ID = -1;
 	allowDeath = False
 	energyThreshold = 80
 	actions = ['north', 'south', 'east','west','eat','pickup','drop']
 
-	def __init__(self,starty,startx, env, foodTypes, idnum = 1):
+	def __init__(self,starty,startx, env, foodTypes, max_energy = 100.0, start_energy = 50.0, idnum = 1):
 
 		#Initialize instance parameters
 		self.y = starty
@@ -30,8 +31,8 @@ class Animat:
 		self.env = env
 		self.ID = idnum
 		self.foodTypes = foodTypes
-		self.energy = [1000.0] * len(self.foodTypes)
-		self.maxEnergy = [1500.0] * len(self.foodTypes)
+		self.energy = [start_energy] * len(self.foodTypes)
+		self.maxEnergy = [max_energy] * len(self.foodTypes)
 		self.previousEnergy = copy.copy(self.energy)
 		self.energyUsageRate = [1.0/len(self.foodTypes)] * len(self.foodTypes)
 		self.foodsEaten = [0] * len(self.foodTypes)
@@ -63,6 +64,7 @@ class Animat:
 		currentState  = self.getState()
 		targetFood = self.getTargetFoodSource()
 		targetFoodDirection = self.senseEnvironment(targetFood)
+		#print targetFood,self.energy
 		action = self.qLearn.chooseAction(currentState)
 		self.performQLearnAction(action)
 		reward = self.getReward(targetFoodDirection, action) #update energies and get the reward after performing action
@@ -299,8 +301,9 @@ class Animat:
 			else:
 				return 'notholding';
 
-	def replenishEnergy(self):
-		self.energy = [1000.0] * len(self.foodTypes)
+	def replenishEnergy(self,energy=500.0):
+		self.energy = [energy] * len(self.foodTypes)
+		self.alive = True
 
 	#reset flags for next iteration
 	def resetFlags(self):
@@ -337,11 +340,14 @@ class Animat:
 		if targetDirection == action and self.moved:
 			LIVING_COST = 0
 			MOVEMENT_COST = 0
+			#gradientReward = LIVING_COST + MOVEMENT_COST #offset cost if following the target gradient
 			#print targetDirection, action
-		
+
+
 		#Subtract living cost and movement cost for each energy rate
 		self.energy = [ currEnergy + EATING_REWARD * foodEaten - rate * (LIVING_COST  + MOVEMENT_COST * self.moved) for currEnergy, rate, foodEaten in zip(self.energy, self.energyUsageRate, self.foodsEaten)]
 		self.energy = [ min(currEnergy, maxEnergy) for currEnergy, maxEnergy in zip(self.energy,self.maxEnergy)] #Limit energy to max energy
+		
 		
 		#Compute delta energy for each energy bucket
 		deltaEnergy = [ currEnergy - prevEnergy for currEnergy, prevEnergy in zip(self.energy, previousEnergy)]
@@ -357,9 +363,10 @@ class Animat:
 
 		reward = netDeltaEnergy * rewardsMultiplier + gradientReward
 
-		if targetDirection == action:
-			pass
-			#print reward
+		Animat.energyPerTick[Animat.energyPerTickIndex] += netDeltaEnergy
+
+		#print action, targetDirection, self.foodsEaten, previousEnergy, self.energy, deltaEnergy, netDeltaEnergy
+		#print reward
 
 		return reward
 

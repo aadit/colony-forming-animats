@@ -34,7 +34,7 @@ toPlot = zeros((mapsize,mapsize));
 animats = [];
 deadAnimats = [];
 for a in range(0,20):
-	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes));
+	animats.append(Animat(random.randrange(0,mapsize),random.randrange(0,mapsize),env,foodTypes,1000,500));
 
 Animat.allowDeath = False
 # Training session
@@ -86,9 +86,9 @@ env[0].addFoodGenerator(45,12,200,5000); #y, x, regeneration rate, food bitsize
 env[1].addFoodGenerator(53,90,200,5000);
 env[2].addFoodGenerator(3,53,200,5000);
 env[3].addFoodGenerator(96,49,200,5000);
-Animat.allowDeath = True
+Animat.allowDeath = False
 for a in animats:
-	a.replenishEnergy()
+	a.replenishEnergy(1000)
 	
 for i in range(0,15000):
 	for e in env:
