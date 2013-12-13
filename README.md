@@ -1,7 +1,4 @@
 
-
-
-
 Colony Formation
 CS263C Final Project Report
 
@@ -12,7 +9,8 @@ Aadit Patel
 603586873
 
 UCLA Fall 2013
-
+
+
 I. Hypothesis
 
 The main hypothesis of this project is to induce colony formation in insect-like animats through learning, which in turn will minimize collective energy expenditure as a secondary effect. The animats’ environment contains multiple food sources that each animat must eat in order to survive. Animats are able to sense food gradients, eat food, and pickup or drop food. Colonies should form in between food source locations, such that animats will not need to unnecessarily expend energy  traversing the map to eat multiple foods. Effectively placed colonies should include animats that return to food sources to bring food back to the colony.
