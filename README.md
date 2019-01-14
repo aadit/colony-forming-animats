@@ -3,10 +3,8 @@ Colony Formation
 CS263C Final Project Report
 
 Lawrence Chang
-604271443
 
 Aadit Patel
-603586873
 
 UCLA Fall 2013
 
